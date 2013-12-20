@@ -19,6 +19,7 @@ class Weather:
       'feeltemp' : str(    self.data["current_observation"]["feelslike_c"]),
       'sky'      : str(    self.data["current_observation"]["weather"]),
       'pressure' : str(    self.data["current_observation"]["pressure_mb"]),
+      'presTrend': str(    self.data["current_observation"]["pressure_trend"]),
       'wind'     : str(int(self.data["current_observation"]["wind_kph"]*4/9))
     }
 

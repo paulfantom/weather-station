@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from pprint import pprint
 import sys
 
 class Blocks():
@@ -123,7 +122,20 @@ class Blocks():
 #      for i in range(a):
 #        for j in range(d-b):
 #          obj.block[i].insert(j,insertion) 
- 
+
+  def center(self,width):
+    diff = width - len(self.block[1])
+    if diff <= 0:
+      return self
+    ldiff = diff/2
+    rdiff = ldiff + diff % 2
+    for i in range(len(self.block)):
+      for j in range(ldiff):
+        self.block[i].insert(j,' ')
+      for k in range(rdiff):
+        self.block[i].append(' ')
+    return self
+
   def imagine(self,debug=None):
     height = len(self.block)
     width  = len(self.block[1])
@@ -139,6 +151,7 @@ class Blocks():
 if __name__ == '__main__':
   from weather import Weather
   from pyfiglet import Figlet
+  from pprint import pprint
   from re import sub
 
   global SCREEN_X
@@ -152,25 +165,11 @@ if __name__ == '__main__':
   bigFont   = Figlet(font='univers')
   smallFont = Figlet(font='straight')
 
-  tempForecast = Blocks(smallFont.renderText(weather.forecast()['today']['temp_low'] + '/' + weather.forecast()['today']['temp_high']))
-  tempCurrent  = Blocks(bigFont.renderText("T: " + weather.conditions()['temp'] + " (" + weather.conditions()['feeltemp'] + ") "))
+  tempCurrent  = Blocks(bigFont.renderText("T: " 
+                                              + weather.conditions()['temp'] 
+                                              + " (" 
+                                              + weather.conditions()['feeltemp'] 
+                                              + ") "))
 
-  tempForecast **= Blocks(smallFont.renderText(weather.forecast()['tomorrow']['temp_low'] + '/' + weather.forecast()['tomorrow']['temp_high'])) 
-  tempForecast **= Blocks(smallFont.renderText(weather.forecast()['dayafter']['temp_low'] + '/' + weather.forecast()['dayafter']['temp_high'])) 
-
-#  tempCurrent  &= tempForecast
-
-  windCurrent  = Blocks(bigFont.renderText(weather.conditions()['wind'] + " m/s "))
-  windForecast = Blocks(smallFont.renderText(weather.forecast()['today']['wind']))
-
-  windForecast **= Blocks(smallFont.renderText(weather.forecast()['tomorrow']['wind']))
-  windForecast **= Blocks(smallFont.renderText(weather.forecast()['dayafter']['wind']))
-
-#  windCurrent  &= windForecast
-  
-  tempCurrent  &= tempForecast
-  windCurrent  &= windForecast
-  tempCurrent **= windCurrent
-  if weather.conditions()['sky']:
-    tempCurrent **= Blocks(bigFont.renderText(sub(r'Partly','P.',weather.conditions()['sky'])))
+  tempCurrent.center(100)
   tempCurrent.imagine(True)

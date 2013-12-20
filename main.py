@@ -59,4 +59,4 @@ if __name__ == '__main__':
 
   if weather.conditions()['sky']:
     tempCurrent **= Blocks(bigFont.renderText(sub(r'Partly','P.',weather.conditions()['sky']))).center(SCREEN_X)
-  tempCurrent.imagine(True)
+  tempCurrent.imagine()

@@ -9,10 +9,10 @@ import sys
 
 if __name__ == '__main__':
 
-  if len(sys.argv) > 1:
+  if len(sys.argv) >1:
     location = sys.argv[1] 
   else:
-    location = 'autoip'
+    location = 'PL/Krakow'
   global SCREEN_X
   global SCREEN_Y
   API_KEY="fecfc874ac6ad136"
@@ -24,14 +24,14 @@ if __name__ == '__main__':
   bigFont   = Figlet(font='univers')
   smallFont = Figlet(font='straight')
 
-  tempForecast = Blocks(smallFont.renderText(  weather.forecast()['today']['temp_low'] 
-                                             + '/' 
-                                             + weather.forecast()['today']['temp_high']))
+  tempForecast = Blocks(smallFont.renderText(  weather.forecast()['today']['temp_low']
+                                               + '/'
+                                               + weather.forecast()['today']['temp_high']))
   tempCurrent  = Blocks(  bigFont.renderText(  "T: " 
-                                             + weather.conditions()['temp'] 
-                                             + " (" 
-                                             + weather.conditions()['feeltemp'] 
-                                             + ") "))
+                                               + weather.conditions()['temp'] 
+                                               + " (" 
+                                               + weather.conditions()['feeltemp'] 
+                                               + ") "))
 
   tempForecast **= Blocks(smallFont.renderText(  weather.forecast()['tomorrow']['temp_low'] 
                                                + '/' 
@@ -58,5 +58,5 @@ if __name__ == '__main__':
   tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(SCREEN_X)
 
   if weather.conditions()['sky']:
-    tempCurrent **= Blocks(bigFont.renderText(sub(r'Partly','P.',weather.conditions()['sky']))).center(SCREEN_X)
+    tempCurrent **= Blocks(bigFont.renderText(sub(r'Scattered','S.',sub(r'Partly','P.',weather.conditions()['sky'])))).center(SCREEN_X)
   tempCurrent.imagine()

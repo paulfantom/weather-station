@@ -58,5 +58,9 @@ if __name__ == '__main__':
   tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(SCREEN_X)
 
   if weather.conditions()['sky']:
-    tempCurrent **= Blocks(bigFont.renderText(sub(r'Scattered','S.',sub(r'Partly','P.',weather.conditions()['sky'])))).center(SCREEN_X)
+    tempCurrent **= Blocks(bigFont.renderText(sub(r'Mostly','M.',
+                                              sub(r'Scattered','S.',
+                                              sub(r'Partly','P.',
+                                              weather.conditions()['sky'])))
+                                              )).center(SCREEN_X)
   tempCurrent.imagine()

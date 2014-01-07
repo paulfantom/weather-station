@@ -51,16 +51,20 @@ if __name__ == '__main__':
   tempCurrent **= windCurrent.center(SCREEN_X)
   
   if weather.conditions()['presTrend'] == '0':
-    pressureString = weather.conditions()['pressure'] + " hpa"
+    pressureString = weather.conditions()['pressure'] + "hpa"
   else:  
-    pressureString =  weather.conditions()['presTrend'] + " " + weather.conditions()['pressure'] + " hpa"
+    pressureString =  weather.conditions()['presTrend'] + " " + weather.conditions()['pressure'] + "hpa"
 
   tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(SCREEN_X)
 
   if weather.conditions()['sky']:
-    tempCurrent **= Blocks(bigFont.renderText(sub(r'Mostly','M.',
-                                              sub(r'Scattered','S.',
-                                              sub(r'Partly','P.',
-                                              weather.conditions()['sky'])))
-                                              )).center(SCREEN_X)
+#    tempCurrent **= Blocks(bigFont.renderText(sub(r'Mostly','M.',
+#                                              sub(r'Scattered','S.',
+#                                              sub(r'Partly','P.',
+#                                              sub(r'Freezing','F.',
+#                                              sub(r'Patches','P.',
+#                                              weather.conditions()['sky'])))))
+#                                              )).center(SCREEN_X)
+    tempCurrent **= Blocks(bigFont.renderText(sub(r'[^A-Z](.+)\s','. ',weather.conditions()['sky']))).center(SCREEN_X)
+
   tempCurrent.imagine()

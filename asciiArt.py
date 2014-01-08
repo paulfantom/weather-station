@@ -136,7 +136,11 @@ class Blocks():
         self.block[i].append(' ')
     return self
 
-  def imagine(self,debug=None):
+  def imagine(self,path='/tmp/weather',debug=None):
+    if not debug:
+      temp = sys.stdout
+      sys.stdout = open(path, 'w')
+
     height = len(self.block)
     width  = len(self.block[1])
     for i in range(height):
@@ -146,6 +150,10 @@ class Blocks():
           print
     if debug:
       print str(height) + " x " + str(width)
+    if not debug:
+      sys.stdout.close()
+      sys.stdout = temp
+      self.imagine(self,path,debug=False)
 
 
 if __name__ == '__main__':

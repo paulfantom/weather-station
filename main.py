@@ -6,21 +6,7 @@ from pprint   import pprint
 from re       import sub
 import sys
 
-
-if __name__ == '__main__':
-
-  if len(sys.argv) >1:
-    location = sys.argv[1] 
-  else:
-    location = 'PL/Krakow'
-  global SCREEN_X
-  global SCREEN_Y
-  API_KEY="fecfc874ac6ad136"
-  SCREEN_X = 100
-  SCREEN_Y = 55
-
-  weather   = Weather(location)
-#  weather   = Weather()
+def kindleDisplay(weather):
   bigFont   = Figlet(font='univers')
   smallFont = Figlet(font='straight')
 
@@ -58,13 +44,24 @@ if __name__ == '__main__':
   tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(SCREEN_X)
 
   if weather.conditions()['sky']:
-#    tempCurrent **= Blocks(bigFont.renderText(sub(r'Mostly','M.',
-#                                              sub(r'Scattered','S.',
-#                                              sub(r'Partly','P.',
-#                                              sub(r'Freezing','F.',
-#                                              sub(r'Patches','P.',
-#                                              weather.conditions()['sky'])))))
-#                                              )).center(SCREEN_X)
     tempCurrent **= Blocks(bigFont.renderText(sub(r'[^A-Z](.+)\s','. ',weather.conditions()['sky']))).center(SCREEN_X)
 
   tempCurrent.imagine()
+
+
+if __name__ == '__main__':
+
+  if len(sys.argv) >1:
+    location = sys.argv[1] 
+  else:
+    location = 'PL/Krakow'
+  global SCREEN_X
+  global SCREEN_Y
+  API_KEY="fecfc874ac6ad136"
+  SCREEN_X = 100
+  SCREEN_Y = 55
+
+  weather   = Weather(location)
+#  weather   = Weather()
+
+  kindleDisplay(weather)

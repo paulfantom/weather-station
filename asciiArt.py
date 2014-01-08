@@ -136,7 +136,11 @@ class Blocks():
         self.block[i].append(' ')
     return self
 
-  def imagine(self,debug=None):
+  def imagine(self,path='/tmp/weather',debug=False):
+    if not debug:
+      temp = sys.stdout
+      sys.stdout = open(path, 'w')
+
     height = len(self.block)
     width  = len(self.block[1])
     for i in range(height):
@@ -146,6 +150,10 @@ class Blocks():
           print
     if debug:
       print str(height) + " x " + str(width)
+      self.imagine(self,path,False)
+    if not debug:
+      sys.stdout.close()
+      sys.stdout = temp
 
 
 if __name__ == '__main__':
@@ -154,11 +162,7 @@ if __name__ == '__main__':
   from pprint import pprint
   from re import sub
 
-  global SCREEN_X
-  global SCREEN_Y
   API_KEY="fecfc874ac6ad136"
-  SCREEN_X = 100
-  SCREEN_Y = 55
 
   weather   = Weather('PL/Zamosc')
 #  weather   = Weather()
@@ -172,4 +176,4 @@ if __name__ == '__main__':
                                               + ") "))
 
   tempCurrent.center(100)
-  tempCurrent.imagine(True)
+  tempCurrent.imagine()

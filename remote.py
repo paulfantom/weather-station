@@ -59,7 +59,7 @@ class RemoteDisplay:
 
   def connect(self,user='root',password='toor',address='192.168.2.2',port=22):
     self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    self.ssh.connect(address,username=user,password=password,port=port,key_filename='/home/paulfantom/.ssh/id_rsa.pub')
+    self.ssh.connect(address,username=user,password=password,port=port)
     #self.ssh.connect(self.address,username=self.user,password=self.password,port=self.port)
 
   def send(self,where='/mnt/base-us/myts/display'):

@@ -52,7 +52,10 @@ class RemoteDisplay:
     tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(self.x)
   
     if self.weather.conditions()['sky']:
-      tempCurrent **= Blocks(bigFont.renderText(sub(r'[^A-Z](.+)\s','. ',self.weather.conditions()['sky']))).center(self.x)
+      conditions = sub(r'[^A-Z](.+)\s','. ',self.weather.conditions()['sky'])
+      if len(conditions) > 9:
+        conditions = conditions[3:12]
+      tempCurrent **= Blocks(bigFont.renderText(conditions)).center(self.x)
     
     self.tmp = tmp
     tempCurrent.imagine(self.tmp)
@@ -60,7 +63,6 @@ class RemoteDisplay:
   def connect(self,user='root',password='toor',address='192.168.2.2',port=22):
     self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     self.ssh.connect(address,username=user,password=password,port=port)
-    #self.ssh.connect(address,username=user,password=password,port=port,key_filename='/home/paulfantom/.ssh/id_rsa.pub')
     #self.ssh.connect(self.address,username=self.user,password=self.password,port=self.port)
 
   def send(self,where='/mnt/base-us/myts/display'):

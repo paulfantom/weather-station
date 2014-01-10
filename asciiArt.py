@@ -136,6 +136,35 @@ class Blocks():
         self.block[i].append(' ')
     return self
 
+  def trim(self,width,margin='right'):
+#    for i in range(0,len(self.block)):
+#      if len(self.block[i]) > width:
+#        if margin == 'left':
+#          self.block[i] = self.block[i][-1-width:-1]
+#        elif margin == 'both':
+#          self.trim((len(self.block[i])+width)/2,'right')
+#          self.trim(width,'left' )
+#        else:
+#          self.block[i] = self.block[i][0:width]
+
+# less checking (if's excecution) but uglier code:
+    if margin == 'left':
+      for i in range(0,len(self.block)):
+        if len(self.block[i]) > width:
+          self.block[i] = self.block[i][-1-width:-1]
+    elif margin == 'both':
+      for i in range(0,len(self.block)):
+        if len(self.block[i]) > width:
+          self.trim((len(self.block[i])+width)/2,'right')
+          self.trim(width,'left' )
+    else:
+      for i in range(0,len(self.block)):
+        if len(self.block[i]) > width:
+          self.block[i] = self.block[i][0:width]
+
+    return self
+        
+
   def imagine(self,path='/tmp/weather',debug=False):
     if not debug:
       temp = sys.stdout
@@ -150,7 +179,7 @@ class Blocks():
           print
     if debug:
       print str(height) + " x " + str(width)
-      self.imagine(self,path,False)
+      self.imagine(path,False)
     if not debug:
       sys.stdout.close()
       sys.stdout = temp
@@ -176,4 +205,5 @@ if __name__ == '__main__':
                                               + ") "))
 
   tempCurrent.center(100)
-  tempCurrent.imagine()
+  tempCurrent.trim(80,'both')
+  tempCurrent.imagine('/tmp/weather',True)

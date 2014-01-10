@@ -18,21 +18,21 @@ class RemoteDisplay:
     bigFont   = Figlet(font='univers')
     smallFont = Figlet(font='straight')
   
-    tempForecast = Blocks(smallFont.renderText(  self.weather.forecast()['today']['temp_low']
+    tempForecast = Blocks(smallFont.renderText(    str(self.weather.forecast()['today']['temp_low'])
                                                  + '/'
-                                                 + self.weather.forecast()['today']['temp_high']))
-    tempCurrent  = Blocks(  bigFont.renderText(  "T: " 
-                                                 + self.weather.conditions()['temp'] 
+                                                 + str(self.weather.forecast()['today']['temp_high'])))
+    tempCurrent  = Blocks(  bigFont.renderText(    "T: " 
+                                                 + str(self.weather.conditions()['temp']) 
                                                  + " (" 
-                                                 + self.weather.conditions()['feeltemp'] 
+                                                 + str(self.weather.conditions()['feeltemp']) 
                                                  + ") "))
   
-    tempForecast **= Blocks(smallFont.renderText(  self.weather.forecast()['tomorrow']['temp_low'] 
+    tempForecast **= Blocks(smallFont.renderText(  str(self.weather.forecast()['tomorrow']['temp_low']) 
                                                  + '/' 
-                                                 + self.weather.forecast()['tomorrow']['temp_high'])) 
-    tempForecast **= Blocks(smallFont.renderText(  self.weather.forecast()['dayafter']['temp_low'] 
+                                                 + str(self.weather.forecast()['tomorrow']['temp_high']))) 
+    tempForecast **= Blocks(smallFont.renderText(  str(self.weather.forecast()['dayafter']['temp_low']) 
                                                  + '/' 
-                                                 + self.weather.forecast()['dayafter']['temp_high'])) 
+                                                 + str(self.weather.forecast()['dayafter']['temp_high']))) 
   
     windCurrent  = Blocks(bigFont.renderText(str(int(self.weather.conditions()['wind_mph']) * 4/9) + " m/s "))
     windForecast = Blocks(smallFont.renderText(str(int(self.weather.forecast()['today']['wind_mph'])*4/9)))
@@ -45,9 +45,9 @@ class RemoteDisplay:
     tempCurrent **= windCurrent.center(self.x)
     
     if self.weather.conditions()['presTrend'] == '0':
-      pressureString = self.weather.conditions()['pressure'] + "hpa"
+      pressureString = str(self.weather.conditions()['pressure']) + "hpa"
     else:  
-      pressureString =  self.weather.conditions()['presTrend'] + " " + self.weather.conditions()['pressure'] + "hpa"
+      pressureString = self.weather.conditions()['presTrend'] + " " + str(self.weather.conditions()['pressure']) + "hpa"
   
     tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(self.x)
   

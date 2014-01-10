@@ -69,6 +69,7 @@ class RemoteDisplay:
 #          conditions = conditions[3:12]
       tempCurrent **= Blocks(bigFont.renderText(conditions)).center(self.x)
     
+    tempCurrent **= Blocks(smallFont.renderText("Pollution " + self.weather.pollution()['pm10'])).center(self.x)
     self.tmp = tmp
     tempCurrent.imagine(self.tmp)
 

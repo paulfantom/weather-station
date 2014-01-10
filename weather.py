@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 
 import urllib2
+import urllib
 import json
+from BeautifulSoup import BeautifulSoup
 
 #global API_KEY
 API_KEY="fecfc874ac6ad136"
 
 class Weather:
-  def __init__(self,location="autoip",options="conditions/forecast",apikey=API_KEY):
+  def __init__(self,location="autoip",pollution="Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego",apikey=API_KEY):
+    options="conditions/forecast"
     wundergroundResponse = urllib2.urlopen(
       "http://api.wunderground.com/api/" + apikey + "/" + options + "/q/" + location + ".json").read()
     self.data = json.loads(wundergroundResponse)
+    aqicnResponse = urllib2.urlopen("http://aqicn.org/?city=" + pollution + "&size=xlarge")
+    self.aqicn = BeautifulSoup(aqicnResponse.read())
 
   def conditions(self):
     return {
@@ -52,11 +57,21 @@ class Weather:
        }
 
     }
+
+  def pollution(self):
+    return {
+      "pm10"        : self.aqicn.find('td', attrs={'id':'cur_pm10'}).div.contents[0],
+      "pm25"        : self.aqicn.find('td', attrs={'id':'cur_pm25'}).div.contents[0],
+      "no2"         : self.aqicn.find('td', attrs={'id':'cur_no2'} ).div.contents[0],
+      "so2"         : self.aqicn.find('td', attrs={'id':'cur_so2'} ).div.contents[0],
+      "co"          : self.aqicn.find('td', attrs={'id':'cur_co'}  ).div.contents[0]
+    }
+
   
 
 if __name__ == '__main__':
   from pprint import pprint
   w = Weather("PL/Krakow")
-  print w.conditions()['sky']
   pprint(w.conditions())
   pprint(w.forecast())
+  pprint(w.pollution())

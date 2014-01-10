@@ -58,9 +58,9 @@ class RemoteDisplay:
       conditions = self.weather.conditions()['sky']
       try:
         pos = conditions.rindex(' ')
-        small      = conditions[0:pos][0:41]  # max 41 chars
+        small      = conditions[0:pos]  # max 41 chars
         conditions = conditions[pos+1:len(conditions)]
-        tempCurrent **= Blocks(smallFont.renderText(small).center(self.x))
+        tempCurrent **= Blocks(smallFont.renderText(small)).center(self.x)
       except ValueError:
         pass
 #      if len(conditions) > 9:

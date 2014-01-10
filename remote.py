@@ -52,9 +52,7 @@ class RemoteDisplay:
     tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(self.x)
   
     if self.weather.conditions()['sky']:
-      tempCurrent **= Blocks(bigFont.renderText(sub(r'[^A-Z](.+)\s','. ',
-                                                sub(r's$','',
-                                                self.weather.conditions()['sky'])))).center(self.x)
+      tempCurrent **= Blocks(bigFont.renderText(sub(r'[^A-Z](.+)\s','. ',self.weather.conditions()['sky']))).center(self.x)
     
     self.tmp = tmp
     tempCurrent.imagine(self.tmp)

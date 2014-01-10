@@ -1,7 +1,7 @@
-needed package:
+needed packages:
   pyfiglet
   paramiko (for ssh only)
-needed font:
+needed fonts:
   straight.flf
   univers.flf
 

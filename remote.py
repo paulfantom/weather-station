@@ -47,14 +47,26 @@ class RemoteDisplay:
     if self.weather.conditions()['presTrend'] == '0':
       pressureString = str(self.weather.conditions()['pressure']) + "hpa"
     else:  
-      pressureString = self.weather.conditions()['presTrend'] + " " + str(self.weather.conditions()['pressure']) + "hpa"
+      pressureString = ( self.weather.conditions()['presTrend']
+                      + " "
+                      + str(self.weather.conditions()['pressure'])
+                      + "hpa")
   
     tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(self.x)
   
     if self.weather.conditions()['sky']:
-      conditions = sub(r'[^A-Z](.+)\s','. ',self.weather.conditions()['sky'])
-      if len(conditions) > 9:
-        conditions = conditions[3:12]
+      conditions = self.weather.conditions()['sky']
+      try:
+        pos = conditions.rindex(' ')
+        small      = conditions[0:pos][0:41]  # max 41 chars
+        conditions = conditions[pos+1:len(conditions)]
+        tempCurrent **= Blocks(smallFont.renderText(small).center(self.x))
+      except ValueError:
+        pass
+#      if len(conditions) > 9:
+#        conditions = sub(r'[^A-Z](.+)\s','. ',self.weather.conditions()['sky'])
+#        if len(conditions) > 9:
+#          conditions = conditions[3:12]
       tempCurrent **= Blocks(bigFont.renderText(conditions)).center(self.x)
     
     self.tmp = tmp

@@ -34,11 +34,11 @@ class RemoteDisplay:
                                                  + '/' 
                                                  + self.weather.forecast()['dayafter']['temp_high'])) 
   
-    windCurrent  = Blocks(bigFont.renderText(self.weather.conditions()['wind'] + " m/s "))
-    windForecast = Blocks(smallFont.renderText(self.weather.forecast()['today']['wind']))
+    windCurrent  = Blocks(bigFont.renderText(str(int(self.weather.conditions()['wind_mph']) * 4/9) + " m/s "))
+    windForecast = Blocks(smallFont.renderText(str(int(self.weather.forecast()['today']['wind_mph'])*4/9)))
   
-    windForecast **= Blocks(smallFont.renderText(self.weather.forecast()['tomorrow']['wind']))
-    windForecast **= Blocks(smallFont.renderText(self.weather.forecast()['dayafter']['wind']))
+    windForecast **= Blocks(smallFont.renderText(str(int(self.weather.forecast()['tomorrow']['wind_mph'])*4/9)))
+    windForecast **= Blocks(smallFont.renderText(str(int(self.weather.forecast()['dayafter']['wind_mph'])*4/9)))
     tempCurrent  &= tempForecast
     tempCurrent.center(self.x)
     windCurrent  &= windForecast

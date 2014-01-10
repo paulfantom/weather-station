@@ -20,7 +20,8 @@ class Weather:
       'sky'      : str(    self.data["current_observation"]["weather"]),
       'pressure' : str(    self.data["current_observation"]["pressure_mb"]),
       'presTrend': str(    self.data["current_observation"]["pressure_trend"]),
-      'wind'     : str(int(self.data["current_observation"]["wind_kph"]*4/9))
+      'wind_mph' : str(int(self.data["current_observation"]["wind_mph"])),
+      'wind_kph' : str(int(self.data["current_observation"]["wind_kph"]))
     }
 
   def forecast(self):
@@ -30,21 +31,24 @@ class Weather:
         'temp_low'  : str(    self.data["forecast"]["simpleforecast"]["forecastday"][0]["low"]["celsius"]),
         'humidity'  : str(    self.data["forecast"]["simpleforecast"]["forecastday"][0]["avehumidity"]),
         'sky'       : str(    self.data["forecast"]["simpleforecast"]["forecastday"][0]["conditions"]),
-        'wind'      : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][0]["avewind"]["mph"]*4/9))
+        'wind_mph'  : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][0]["avewind"]["mph"])),
+        'wind_kph'  : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][0]["avewind"]["kph"]))
         },
       "tomorrow": {
        'temp_high'  : str(    self.data["forecast"]["simpleforecast"]["forecastday"][1]["high"]["celsius"]),
        'temp_low'   : str(    self.data["forecast"]["simpleforecast"]["forecastday"][1]["low"]["celsius"]),
        'humidity'   : str(    self.data["forecast"]["simpleforecast"]["forecastday"][1]["avehumidity"]),
        'sky'        : str(    self.data["forecast"]["simpleforecast"]["forecastday"][1]["conditions"]),
-       'wind'       : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][1]["avewind"]["mph"]*4/9))
+       'wind_mph'   : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][1]["avewind"]["mph"])),
+       'wind_kph'   : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][1]["avewind"]["kph"]))
        },
       "dayafter": {
        'temp_high'  : str(    self.data["forecast"]["simpleforecast"]["forecastday"][2]["high"]["celsius"]),
        'temp_low'   : str(    self.data["forecast"]["simpleforecast"]["forecastday"][2]["low"]["celsius"]),
        'humidity'   : str(    self.data["forecast"]["simpleforecast"]["forecastday"][2]["avehumidity"]),
        'sky'        : str(    self.data["forecast"]["simpleforecast"]["forecastday"][2]["conditions"]),
-       'wind'       : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][2]["avewind"]["mph"]*4/9))
+       'wind_mph'   : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][2]["avewind"]["mph"])),
+       'wind_kph'   : str(int(self.data["forecast"]["simpleforecast"]["forecastday"][2]["avewind"]["kph"]))
        }
 
     }

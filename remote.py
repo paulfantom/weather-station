@@ -21,18 +21,18 @@ class RemoteDisplay:
     tempForecast = Blocks(smallFont.renderText(    str(self.weather.forecast()['today']['temp_low'])
                                                  + '/'
                                                  + str(self.weather.forecast()['today']['temp_high'])))
-    tempCurrent  = Blocks(  bigFont.renderText(    "T: " 
+    tempCurrent  = Blocks(  bigFont.renderText(  "T: " 
                                                  + str(self.weather.conditions()['temp']) 
                                                  + " (" 
                                                  + str(self.weather.conditions()['feeltemp']) 
-                                                 + ") "))
+                                                 + ")"))
   
     tempForecast **= Blocks(smallFont.renderText(  str(self.weather.forecast()['tomorrow']['temp_low']) 
                                                  + '/' 
                                                  + str(self.weather.forecast()['tomorrow']['temp_high']))) 
     tempForecast **= Blocks(smallFont.renderText(  str(self.weather.forecast()['dayafter']['temp_low']) 
                                                  + '/' 
-                                                 + str(self.weather.forecast()['dayafter']['temp_high']))) 
+                                                 + str(self.weather.forecast()['dayafter']['temp_high'])))
   
     windCurrent  = Blocks(bigFont.renderText(str(int(self.weather.conditions()['wind_mph']) * 4/9) + " m/s "))
     windForecast = Blocks(smallFont.renderText(str(int(self.weather.forecast()['today']['wind_mph'])*4/9)))
@@ -40,7 +40,7 @@ class RemoteDisplay:
     windForecast **= Blocks(smallFont.renderText(str(int(self.weather.forecast()['tomorrow']['wind_mph'])*4/9)))
     windForecast **= Blocks(smallFont.renderText(str(int(self.weather.forecast()['dayafter']['wind_mph'])*4/9)))
     tempCurrent  &= tempForecast
-    tempCurrent.center(self.x)
+    tempCurrent.center(self.x).trim(self.x)
     windCurrent  &= windForecast
     tempCurrent **= windCurrent.center(self.x)
     

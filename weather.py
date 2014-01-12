@@ -9,56 +9,88 @@ from BeautifulSoup import BeautifulSoup
 API_KEY="fecfc874ac6ad136"
 
 class Weather:
-  def __init__(self,location="autoip",pollution="Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego",apikey=API_KEY):
+  def __init__(self,
+               location="autoip",
+               pollution="Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego",
+               apikey=API_KEY):
+
     options="conditions/forecast"
-    wundergroundResponse = urllib2.urlopen(
-      "http://api.wunderground.com/api/" + apikey + "/" + options + "/q/" + location + ".json").read()
-    self.data = json.loads(wundergroundResponse)
-    aqicnResponse = urllib2.urlopen("http://aqicn.org/?city=" + pollution + "&size=xlarge")
-    self.aqicn = BeautifulSoup(aqicnResponse.read())
+    try:
+      wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
+                                             + apikey
+                                             + "/"
+                                             + options
+                                             + "/q/"
+                                             + location
+                                             + ".json").read()
+      self.data = json.loads(wundergroundResponse)
+    except Exception:
+      self.data = None
+
+    try:
+      aqicnResponse = urllib2.urlopen("http://aqicn.org/?city="
+                                      + pollution
+                                      + "&size=xlarge")
+      self.aqicn = BeautifulSoup(aqicnResponse.read())
+    except Exception:
+      self.aqicn = None
 
   def conditions(self):
+    if self.data == None:
+      return None
+    current = self.data["current_observation"]
     return {
-      'temp'     :     self.data["current_observation"]["temp_c"],
-      'humidity' :     self.data["current_observation"]["relative_humidity"],
-      'feeltemp' :     self.data["current_observation"]["feelslike_c"],
-      'pressure' :     self.data["current_observation"]["pressure_mb"],
-      'presTrend': str(self.data["current_observation"]["pressure_trend"]),
-      'sky'      : str(self.data["current_observation"]["weather"]),
-      'wind_mph' : int(self.data["current_observation"]["wind_mph"]),
-      'wind_kph' : int(self.data["current_observation"]["wind_kph"])
+      'temp'     :     current["temp_c"],
+      'humidity' :     current["relative_humidity"],
+      'feeltemp' :     current["feelslike_c"],
+      'pressure' :     current["pressure_mb"],
+      'presTrend': str(current["pressure_trend"]),
+      'sky'      : str(current["weather"]),
+      'wind_mph' : int(current["wind_mph"]),
+      'wind_kph' : int(current["wind_kph"])
     }
 
   def forecast(self):
+    if self.data == None:
+      return None
+    forecast = self.data["forecast"]["simpleforecast"]["forecastday"]
     return {
       "today": {
-        'temp_high' :     self.data["forecast"]["simpleforecast"]["forecastday"][0]["high"]["celsius"],
-        'temp_low'  :     self.data["forecast"]["simpleforecast"]["forecastday"][0]["low"]["celsius"],
-        'humidity'  :     self.data["forecast"]["simpleforecast"]["forecastday"][0]["avehumidity"],
-        'sky'       : str(self.data["forecast"]["simpleforecast"]["forecastday"][0]["conditions"]),
-        'wind_mph'  : int(self.data["forecast"]["simpleforecast"]["forecastday"][0]["avewind"]["mph"]),
-        'wind_kph'  : int(self.data["forecast"]["simpleforecast"]["forecastday"][0]["avewind"]["kph"])
+        'temp_high' :     forecast[0]["high"]["celsius"],
+        'temp_low'  :     forecast[0]["low"]["celsius"],
+        'humidity'  :     forecast[0]["avehumidity"],
+        'sky'       : str(forecast[0]["conditions"]),
+        'wind_mph'  : int(forecast[0]["avewind"]["mph"]),
+        'wind_kph'  : int(forecast[0]["avewind"]["kph"])
         },
       "tomorrow": {
-       'temp_high'  :     self.data["forecast"]["simpleforecast"]["forecastday"][1]["high"]["celsius"],
-       'temp_low'   :     self.data["forecast"]["simpleforecast"]["forecastday"][1]["low"]["celsius"],
-       'humidity'   :     self.data["forecast"]["simpleforecast"]["forecastday"][1]["avehumidity"],
-       'sky'        : str(self.data["forecast"]["simpleforecast"]["forecastday"][1]["conditions"]),
-       'wind_mph'   : int(self.data["forecast"]["simpleforecast"]["forecastday"][1]["avewind"]["mph"]),
-       'wind_kph'   : int(self.data["forecast"]["simpleforecast"]["forecastday"][1]["avewind"]["kph"])
+       'temp_high'  :     forecast[1]["high"]["celsius"],
+       'temp_low'   :     forecast[1]["low"]["celsius"],
+       'humidity'   :     forecast[1]["avehumidity"],
+       'sky'        : str(forecast[1]["conditions"]),
+       'wind_mph'   : int(forecast[1]["avewind"]["mph"]),
+       'wind_kph'   : int(forecast[1]["avewind"]["kph"])
        },
       "dayafter": {
-       'temp_high'  :     self.data["forecast"]["simpleforecast"]["forecastday"][2]["high"]["celsius"],
-       'temp_low'   :     self.data["forecast"]["simpleforecast"]["forecastday"][2]["low"]["celsius"],
-       'humidity'   :     self.data["forecast"]["simpleforecast"]["forecastday"][2]["avehumidity"],
-       'sky'        : str(self.data["forecast"]["simpleforecast"]["forecastday"][2]["conditions"]),
-       'wind_mph'   : int(self.data["forecast"]["simpleforecast"]["forecastday"][2]["avewind"]["mph"]),
-       'wind_kph'   : int(self.data["forecast"]["simpleforecast"]["forecastday"][2]["avewind"]["kph"])
+       'temp_high'  :     forecast[2]["high"]["celsius"],
+       'temp_low'   :     forecast[2]["low"]["celsius"],
+       'humidity'   :     forecast[2]["avehumidity"],
+       'sky'        : str(forecast[2]["conditions"]),
+       'wind_mph'   : int(forecast[2]["avewind"]["mph"]),
+       'wind_kph'   : int(forecast[2]["avewind"]["kph"])
        }
 
     }
 
   def pollution(self):
+    if self.aqicn == None:
+      return {
+        "pm10"        : "--",
+        "pm25"        : "--",
+        "no2"         : "--",
+        "so2"         : "--",
+        "co"          : "--"
+      }
     return {
       "pm10"        : self.aqicn.find('td', attrs={'id':'cur_pm10'}).div.contents[0],
       "pm25"        : self.aqicn.find('td', attrs={'id':'cur_pm25'}).div.contents[0],

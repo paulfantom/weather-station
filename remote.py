@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from re       import sub
+#from re       import sub
 from asciiArt import Blocks
 from pyfiglet import Figlet
 import paramiko
@@ -27,10 +27,10 @@ class RemoteDisplay:
                         + str(self.weather.forecast()['today']['temp_high']) ) 
     temperatureSmall2 = ( str(self.weather.forecast()['tomorrow']['temp_low']) 
                         + '/' 
-                        + str(self.weather.forecast()['tomorrow']['temp_high']) )
+                        + str(self.weather.forecast()['tomorrow']['temp_high']))
     temperatureSmall3 = ( str(self.weather.forecast()['dayafter']['temp_low']) 
                         + '/' 
-                        + str(self.weather.forecast()['dayafter']['temp_high']) )
+                        + str(self.weather.forecast()['dayafter']['temp_high']))
 
     if len(temperatureBig) > 8 :
       temperatureBig = "t " + str(self.weather.conditions()['temp'])
@@ -39,20 +39,20 @@ class RemoteDisplay:
                                            len(temperatureSmall3)) > 5:
       temperatureBig = "t " + str(self.weather.conditions()['temp'])
       
-    tempCurrent    = Blocks(  bigFont.renderText( temperatureBig ))
+    display    = Blocks(  bigFont.renderText( temperatureBig ))
     tempForecast   = Blocks(smallFont.renderText( temperatureSmall1 ))
     tempForecast **= Blocks(smallFont.renderText( temperatureSmall2 ))
     tempForecast **= Blocks(smallFont.renderText( temperatureSmall3 ))
    
-    windCurrent  = Blocks(bigFont.renderText(str(int(self.weather.conditions()['wind_mph']) * 4/9) + " m/s "))
-    windForecast = Blocks(smallFont.renderText(str(int(self.weather.forecast()['today']['wind_mph'])*4/9)))
+    windCurrent  = Blocks(bigFont.renderText(str(self.weather.conditions()['wind_mph'] * 4/9) + " m/s "))
+    windForecast = Blocks(smallFont.renderText(str(self.weather.forecast()['today']['wind_mph'] * 4/9)))
   
     windForecast **= Blocks(smallFont.renderText(str(int(self.weather.forecast()['tomorrow']['wind_mph'])*4/9)))
     windForecast **= Blocks(smallFont.renderText(str(int(self.weather.forecast()['dayafter']['wind_mph'])*4/9)))
-    tempCurrent  &= tempForecast
-    tempCurrent.center(self.x).trim(self.x)
+    display  &= tempForecast
+    display.center(self.x).trim(self.x)
     windCurrent  &= windForecast
-    tempCurrent **= windCurrent.center(self.x).trim(self.x)
+    display **= windCurrent.center(self.x).trim(self.x)
     
     if self.weather.conditions()['presTrend'] == '0':
       pressureString = str(self.weather.conditions()['pressure']) + "hpa"
@@ -62,7 +62,7 @@ class RemoteDisplay:
                       + str(self.weather.conditions()['pressure'])
                       + "hpa")
   
-    tempCurrent **= Blocks(bigFont.renderText( pressureString )).center(self.x).trim(self.x)
+    display **= Blocks(bigFont.renderText( pressureString )).center(self.x).trim(self.x)
   
     if self.weather.conditions()['sky']:
       conditions = self.weather.conditions()['sky']
@@ -70,26 +70,43 @@ class RemoteDisplay:
         pos = conditions.rindex(' ')
         small      = conditions[0:pos]  # max 41 chars
         conditions = conditions[pos+1:len(conditions)]
-        tempCurrent **= Blocks(smallFont.renderText(small)).center(self.x)
+        display **= Blocks(smallFont.renderText(small)).center(self.x)
       except ValueError:
         pass
 #      if len(conditions) > 9:
 #        conditions = sub(r'[^A-Z](.+)\s','. ',self.weather.conditions()['sky'])
 #        if len(conditions) > 9:
 #          conditions = conditions[3:12]
-      tempCurrent **= Blocks(bigFont.renderText(conditions)).center(self.x).trim(self.x)
+      display **= Blocks(bigFont.renderText(conditions)).center(self.x).trim(self.x)
     
-    tempCurrent **= Blocks(smallFont.renderText("Pollution " + self.weather.pollution()['pm10'])).center(self.x)
+    display **= Blocks(smallFont.renderText("Pollution " 
+                                            + self.weather.pollution()['pm10'])).center(self.x)
     self.tmp = tmp
-    tempCurrent.imagine(self.tmp)
+    display.imagine(self.tmp)
 
   def connect(self,user='root',password='toor',address='192.168.2.2',port=22):
     self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    self.ssh.connect(address,username=user,password=password,port=port)
-    #self.ssh.connect(self.address,username=self.user,password=self.password,port=self.port)
+    try:
+      self.ssh.connect(address,
+                       username=user,
+                       password=password,
+                       port=port,
+                       timeout=4)
+      #self.ssh.connect(self.address,
+      #                 username=self.user,
+      #                 password=self.password,
+      #                 port=self.port
+      #                 timeout=4)
+    except Exception:
+      print "Cannot connect do remote device"
 
   def send(self,where='/mnt/base-us/myts/display'):
-    sftp = self.ssh.open_sftp()
+    try:
+      sftp = self.ssh.open_sftp()
+    except Exception:
+      print "Display not updated"
+      return
+
     sftp.put(self.tmp,where)
 
   def clear(self):

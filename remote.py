@@ -80,11 +80,10 @@ class RemoteDisplay:
       display **= Blocks(bigFont.renderText(conditions)).center(self.x).trim(self.x)
     
     display **= Blocks(smallFont.renderText("PM10: " 
-                                            + self.weather.pollution()['pm10']
-                                            + " AQI || PM2: "
-                                            + self.weather.pollution()['pm25']
-                                            + " AQI"
-                                            )).trim(self.x).center(self.x)
+                                            + str(self.weather.pollution2('pm10')['value'])
+                                            + " || PM2: "
+                                            + str(self.weather.pollution2('pm25')['value'])
+                                           )).trim(self.x).center(self.x)
     self.tmp = tmp
     display.imagine(self.tmp)
 

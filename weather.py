@@ -5,19 +5,17 @@ import urllib
 import json
 from BeautifulSoup import BeautifulSoup
 
-#global API_KEY
-API_KEY="fecfc874ac6ad136"
 
 class Weather:
   def __init__(self,
                location="autoip",
-               pollution="Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego",
-               apikey=API_KEY):
+               pollution=None,
+               apiKey=None):
 
     options="conditions/forecast"
     try:
       wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
-                                             + apikey
+                                             + apiKey
                                              + "/"
                                              + options
                                              + "/q/"

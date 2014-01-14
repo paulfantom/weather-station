@@ -1,0 +1,61 @@
+################################################################################
+#                                                                              #
+# Configuration file for weather module                                        #
+#                                                                              #
+################################################################################
+
+# ==== WEATHER ===============
+[weather]
+# API key from weather underground
+# key can be obtained from:
+# http://www.wunderground.com/weather/api/d/pricing
+# if no APIkey specified then no weather will be gathered
+#APIkey = fecfc874ac6ad136
+# Weather station location from wunderground.com
+# if location if not specified then it will be found by IP
+location = PL/Krakow
+#
+
+# ==== POLLUTION =============
+[pollution]
+# Location of pollution gathering station from aqicn.org
+# if no location specified then pollution gathering will be disabled
+# Example:
+# url: http://aqicn.org/?city=UnitedKingdom/LondonMaryleboneRoad
+# location: UnitedKingdom/LondonMaryleboneRoad
+location = Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego
+#
+# Which particles are you interested in
+# Default is PM2.5 and PM10
+# Other are: no2, so2 and co
+#pollutants = ('pm10','pm25')
+# ============================
+
+# ==== REMOTE DISPLAY ========
+[remote]
+# send current weather and weather forecast to remote display (ex. Kindle)
+#
+# change if you don't want to use remote display option
+use = True
+# 
+# remote screen size:
+# width (default: 100)
+#x = 100
+# height (default: 55)
+#y = 55
+#
+# ssh user (default: 'root')
+#user = root
+#
+# ssh password (default: 'toor')
+#password = toor
+#
+# ssh address (default: '192.168.2.2')
+#address = 192.168.2.2
+#
+# ssh port (default: '22')
+#port = 22
+#
+# remote display file location ( default: '/mnt/base-us/myts/display')
+#location = /mnt/base-us/myts/display
+# ============================

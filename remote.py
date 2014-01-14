@@ -13,8 +13,9 @@ class RemoteDisplay:
     self.y = y
     self.weather = weather
     self.ssh = paramiko.SSHClient()
+    self.tmp='/tmp/weather'
 
-  def asciiDisplay(self,tmp='/tmp/weather'):
+  def asciiDisplay(self,pollutants):
     bigFont   = Figlet(font='univers')
     smallFont = Figlet(font='straight')
   
@@ -78,13 +79,15 @@ class RemoteDisplay:
 #        if len(conditions) > 9:
 #          conditions = conditions[3:12]
       display **= Blocks(bigFont.renderText(conditions)).center(self.x).trim(self.x)
-    
-    display **= Blocks(smallFont.renderText("PM10: " 
+    try:
+      display **= Blocks(smallFont.renderText("PM10: " 
                                             + str(self.weather.pollution2('pm10')['value'])
                                             + " || PM2: "
                                             + str(self.weather.pollution2('pm25')['value'])
                                            )).trim(self.x).center(self.x)
-    self.tmp = tmp
+    except Exception:
+      pass
+
     display.imagine(self.tmp)
 
   def connect(self,user='root',password='toor',address='192.168.2.2',port=22):

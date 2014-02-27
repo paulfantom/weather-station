@@ -125,7 +125,7 @@ class RemoteDisplay:
 
   def asciiDisplay(self,pollutants):
     try:
-      draw(self,pollutants)
+      self.draw(pollutants)
     except Exception:
       print "Probably no internet connection"
       bigFont   = Figlet(font='univers')

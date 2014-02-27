@@ -172,7 +172,7 @@ class Weather:
 
 if __name__ == '__main__':
   from pprint import pprint
-  w = Weather("PL/Krakow")
+  w = Weather("PL/Krakow","Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego")
   pprint(w.conditions())
   pprint(w.forecast())
 #  pprint(w.pollution())

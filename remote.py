@@ -11,14 +11,47 @@ class RemoteDisplay:
   def __init__(self,weather,x=100,y=55):
     self.x = x
     self.y = y
-    self.weather = weather
-    self.ssh = paramiko.SSHClient()
-    self.tmp='/tmp/weather'
+    self.weather   = weather
+    self.tmp       ='/tmp/weather'
+    self.ssh       = paramiko.SSHClient()
+    self.bigFont   = Figlet(font='univers')
+    self.smallFont = Figlet(font='straight')
 
-  def asciiDisplay(self,pollutants):
+#def temperature(self,forecast='right'):
+#    temperatureBig    = ( "t " 
+#                        + str(self.weather.conditions()['temp']) 
+#                        + "(" + str(self.weather.conditions()['feeltemp']) 
+#                        + ")" )
+#    if forecast:
+#      temperatureSmall1 = ( str(self.weather.forecast()['today']['temp_low']) 
+#                          + '/' 
+#                          + str(self.weather.forecast()['today']['temp_high']) ) 
+#      temperatureSmall2 = ( str(self.weather.forecast()['tomorrow']['temp_low']) 
+#                          + '/' 
+#                          + str(self.weather.forecast()['tomorrow']['temp_high']))
+#      temperatureSmall3 = ( str(self.weather.forecast()['dayafter']['temp_low']) 
+#                          + '/' 
+#                          + str(self.weather.forecast()['dayafter']['temp_high']))
+#    else:
+#      pass
+#
+#    if len(temperatureBig) > 8 :
+#      temperatureBig = "t " + str(self.weather.conditions()['temp'])
+#    elif len(temperatureBig) == 8 and max(len(temperatureSmall1),
+#                                          len(temperatureSmall2),
+#                                          len(temperatureSmall3)) > 5:
+#      temperatureBig = "t " + str(self.weather.conditions()['temp'])
+#      
+#    display        = Blocks(  bigFont.renderText( temperatureBig ))
+#    tempForecast   = Blocks(smallFont.renderText( temperatureSmall1 ))
+#    tempForecast **= Blocks(smallFont.renderText( temperatureSmall2 ))
+#    tempForecast **= Blocks(smallFont.renderText( temperatureSmall3 ))
+
+
+  def draw(self,pollutants):
     bigFont   = Figlet(font='univers')
     smallFont = Figlet(font='straight')
-  
+
     temperatureBig    = ( "t " 
                         + str(self.weather.conditions()['temp']) 
                         + "(" + str(self.weather.conditions()['feeltemp']) 
@@ -40,7 +73,7 @@ class RemoteDisplay:
                                            len(temperatureSmall3)) > 5:
       temperatureBig = "t " + str(self.weather.conditions()['temp'])
       
-    display    = Blocks(  bigFont.renderText( temperatureBig ))
+    display        = Blocks(  bigFont.renderText( temperatureBig ))
     tempForecast   = Blocks(smallFont.renderText( temperatureSmall1 ))
     tempForecast **= Blocks(smallFont.renderText( temperatureSmall2 ))
     tempForecast **= Blocks(smallFont.renderText( temperatureSmall3 ))
@@ -90,6 +123,22 @@ class RemoteDisplay:
 
     display.imagine(self.tmp)
 
+  def asciiDisplay(self,pollutants):
+    try:
+      draw(self,pollutants)
+    except Exception:
+      print "Probably no internet connection"
+      bigFont   = Figlet(font='univers')
+      smallFont = Figlet(font='straight')
+      display   = Blocks(  bigFont.renderText( 'No' )).center(self.x).trim(self.x)
+      display **= Blocks(  bigFont.renderText( 'Internet' )).center(self.x).trim(self.x)
+      display **= Blocks(smallFont.renderText( 'OR SOMETHING ELSE WENT WRONG' )).center(self.x).trim(self.x)
+      display **= Blocks(  bigFont.renderText( 'Sorry' )).center(self.x).trim(self.x)
+      display.imagine(self.tmp)
+
+
+
+
   def connect(self,user='root',password='toor',address='192.168.2.2',port=22):
     self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
@@ -123,7 +172,7 @@ class RemoteDisplay:
       print "Couldn't remove temporary file"
 
   def auto(self):
-    self.asciiDisplay()
+    self.asciiDisplay(None)
     self.connect()
     self.send()
     self.clear()
@@ -136,7 +185,7 @@ if __name__ == '__main__':
 
   location = 'PL/Krakow'
   API_KEY="fecfc874ac6ad136"
-  weather   = Weather(location)
+  weather   = Weather(location,'a',API_KEY)
 
   kindle = RemoteDisplay(weather)
   kindle.auto()

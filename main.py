@@ -48,8 +48,9 @@ if __name__ == '__main__':
   except Exception:
     print "Pollutants in [pollution] went wrong"
     pollutants = None
-  
+
   # create weather object
+  print pollutionLocation
   weather = Weather(location,pollutionLocation,apiKey)
 
   # use remote display device?

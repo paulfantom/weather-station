@@ -29,11 +29,53 @@ class Blocks():
     # remove if last two lines are the same (prevent double blank line)
     if self.block[len(self.block)-1] == self.block[len(self.block)-2]:
       del(self.block[len(self.block)-1])
-  
+
+  def join(self,other,orientation='right'):
+    # self &= other
+    # Horizontal join
+
+    #           height      x       width
+    selfDim  = { 'height': len(self.block),
+                 'width' : len(self.block[1]) }
+    otherDim = { 'height': len(other.block), 
+                 'width' : len(other.block[1]) }
+    newDim   = { 'height': 0,
+                 'width' : 0 }
+#    if orientation == 'right' or orientation == 'left':
+#      first  = 'height'
+#      second = 'width'
+#    elif orientation == 'top' or orientation == 'bottom':
+#      first  = 'width'
+#      second = 'height'
+#
+#    if selfDim['height'] > otherDim['height']:
+#      newDim['height'] = selfDim['height']
+#    else:
+#      newDim['height'] = otherDim['height']
+#    newDim['width'] = selfDim['width'] + otherDim['width']
+
+# TODO two directional expand function
+    # make same height
+    if selfDim['height'] < otherDim['height']:
+      for i in range(otherDim['height']-selfDim['height']):
+        self.block.insert(i,['-' for j in range(selfDim['width'])])
+    elif selfDim['height'] > otherDim['height']:
+      for i in range(selfDim['height']-otherDim['height']):
+        other.block.insert(i,['-' for j in range(otherDim['width'])])
+
+    self.imagine(debug=True)
+    other.imagine(debug=True)
+    for i in range(max(selfDim['height'],otherDim['height'])):
+#      for j in range(otherDim['width']):
+#        self.block[i].append(other.block[i][j])
+      self.block[i].extend(other.block[i])
+
+    return new
+
   def __iand__(self,other):
     # self &= other
     # Horizontal join
-    
+
     #           height      x       width
     leftDim  = ( len(self.block),  len(self.block[1]) )
     rightDim = ( len(other.block), len(other.block[1]) )
@@ -52,17 +94,17 @@ class Blocks():
 
     # make same height and center smaller in relation to bigger
     # TODO: center
-        
+
     for i in range(max(leftDim[0],rightDim[0])):
       for j in range(rightDim[1]):
         self.block[i].append(other.block[i][j])
 
     return self
-  
+
   def __ipow__(self,other):
     # self **= other
     # Vertical join
-  
+
     #           height     x     width
     upDim   = ( len(self.block), len(self.block[1]) )
     downDim = ( len(other.block), len(other.block[1]) )
@@ -102,17 +144,9 @@ class Blocks():
 
     for i in range(downDim[0]):
       self.block.append(other.block[i])
- 
+
     return self
- 
-#  def __add__(self,other):
-#    width = len(self.block[1])
-#    import copy
-#    new = copy.deepcopy(self)
-#    for i in range(other):
-#      new.block.insert(i, [' ' for j in range(width)]) 
-#    return new
-#
+
 #  def align(self,obj,(a,b),(c,d),insertion=' '):
 #    if b > d:
 #      for i in range(c):
@@ -163,7 +197,6 @@ class Blocks():
           self.block[i] = self.block[i][0:width]
 
     return self
-        
 
   def imagine(self,path='/tmp/weather',debug=False):
     if not debug:
@@ -191,19 +224,24 @@ if __name__ == '__main__':
   from pprint import pprint
   from re import sub
 
-  API_KEY="fecfc874ac6ad136"
-
-  weather   = Weather('PL/Zamosc')
-#  weather   = Weather()
+#  API_KEY="fecfc874ac6ad136"
+#
+#  weather   = Weather('UK/London')
   bigFont   = Figlet(font='univers')
   smallFont = Figlet(font='straight')
+#
+#  tempCurrent  = Blocks(bigFont.renderText("T: " 
+#                                              + weather.conditions()['temp'] 
+#                                              + " (" 
+#                                              + weather.conditions()['feeltemp'] 
+#                                              + ") "))
+#
+#  tempCurrent.center(100)
+#  tempCurrent.trim(80,'both')
+#  tempCurrent.imagine('/tmp/weather',True)
 
-  tempCurrent  = Blocks(bigFont.renderText("T: " 
-                                              + weather.conditions()['temp'] 
-                                              + " (" 
-                                              + weather.conditions()['feeltemp'] 
-                                              + ") "))
-
-  tempCurrent.center(100)
-  tempCurrent.trim(80,'both')
-  tempCurrent.imagine('/tmp/weather',True)
+  one = Blocks(bigFont.renderText("Kurwa"))
+  two = Blocks(smallFont.renderText("Dupa"))
+  one.imagine(debug=True)
+  two.imagine(debug=True)
+  display = Blocks.join(one,two)

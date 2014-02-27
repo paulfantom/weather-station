@@ -182,10 +182,13 @@ class RemoteDisplay:
 if __name__ == '__main__':
 
   from weather  import Weather
+  from pprint import pprint
 
   location = 'PL/Krakow'
   API_KEY="fecfc874ac6ad136"
   weather   = Weather(location,'a',API_KEY)
+  pprint(weather)
 
-  kindle = RemoteDisplay(weather)
-  kindle.auto()
+  #kindle = RemoteDisplay(weather)
+  #kindle = draw(weather)
+  #kindle.auto()

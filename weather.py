@@ -9,7 +9,7 @@ from BeautifulSoup import BeautifulSoup
 class Weather:
   def __init__(self,
                location="autoip",
-               pollution=None,
+               pollutionLocation=None,
                apiKey=None):
 
     options="conditions/forecast"
@@ -26,9 +26,12 @@ class Weather:
       self.data = None
 
     try:
-      aqicnResponse = urllib2.urlopen("http://aqicn.org/?city="
-                                      + pollution
-                                      + "&size=xlarge")
+#      aqicnResponse = urllib2.urlopen("http://aqicn.org/?city="
+#                                      + pollutionLocation
+#                                      + "&size=xlarge")
+      aqicnResponse = urllib2.urlopen("http://aqicn.org/city/"
+                                      + pollutionLocation
+                                      + "/m")
       self.aqicn = BeautifulSoup(aqicnResponse.read())
 #     EPA table for conversion between AQI and uq/m3 for PM2.5
 #     C_low | C_high | I_low | I_high | Category
@@ -136,12 +139,25 @@ class Weather:
         "co"          : "--"
       }
 
+    try:
+      pm10 =  self.aqicn.find('td', attrs={'id':'cur_pm10'}).div.contents[0]
+      pm25 =  self.aqicn.find('td', attrs={'id':'cur_pm25'}).div.contents[0]
+      no2  =  self.aqicn.find('td', attrs={'id':'cur_no2'} ).div.contents[0]
+      so2  =  self.aqicn.find('td', attrs={'id':'cur_so2'} ).div.contents[0]
+      co   =  self.aqicn.find('td', attrs={'id':'cur_co'}  ).div.contents[0]
+    except Exception:
+      pm10 = -1
+      pm25 = -1
+      no2  = -1
+      so2  = -1
+      co   = -1
+
     return {
-      "pm10"        : self.aqicn.find('td', attrs={'id':'cur_pm10'}).div.contents[0],
-      "pm25"        : self.aqicn.find('td', attrs={'id':'cur_pm25'}).div.contents[0],
-      "no2"         : self.aqicn.find('td', attrs={'id':'cur_no2'} ).div.contents[0],
-      "so2"         : self.aqicn.find('td', attrs={'id':'cur_so2'} ).div.contents[0],
-      "co"          : self.aqicn.find('td', attrs={'id':'cur_co'}  ).div.contents[0]
+      "pm10" : pm10,
+      "pm25" : pm25,
+      "no2"  : no2,
+      "so2"  : so2,
+      "co"   : co
     }
 
   def pollution2(self,pollutant='pm10'):
@@ -149,14 +165,20 @@ class Weather:
     # unit = ug/m3
     if self.aqicn == None:
       return "--"
-
-    value = self.aqicn.find('td', attrs={'id':"cur_" + pollutant}).div.contents[0]
-
-    level=(0,0,0,0,0)
-    for row in self.EPAtable[pollutant]:
-      if row[2] < int(value) and int(value) < row[3]:
-        level=row
-        break
+    
+    try:
+      value = self.aqicn.find('td', attrs={'id':"cur_" + pollutant}).div.contents[0]
+  
+      level=(0,0,0,0,0)
+      for row in self.EPAtable[pollutant]:
+        if row[2] < int(value) and int(value) < row[3]:
+          level=row
+          break
+    except Exception:
+      return {
+        'value'      : -1,
+        'conditions' : 'error'
+      }
 
 # C = (AQI - I_low) * ( C_high - C_low ) / ( I_high - I_low ) + C_low
     try:
@@ -172,7 +194,8 @@ class Weather:
 
 if __name__ == '__main__':
   from pprint import pprint
-  w = Weather("PL/Krakow","Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego")
+  #w = Weather("PL/Krakow","Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego","fecfc874ac6ad136")
+  w = Weather("PL/Krakow","poland/malopolska/krakow/aleja-krasinskiego","fecfc874ac6ad136")
   pprint(w.conditions())
   pprint(w.forecast())
 #  pprint(w.pollution())

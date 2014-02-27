@@ -23,7 +23,7 @@ location = PL/Krakow
 # Example:
 # url: http://aqicn.org/?city=UnitedKingdom/LondonMaryleboneRoad
 # location: UnitedKingdom/LondonMaryleboneRoad
-location = Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego
+location = poland/malopolska/krakow/aleja-krasinskiego
 #
 # Which particles are you interested in
 # Default is PM2.5 and PM10

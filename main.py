@@ -77,7 +77,10 @@ if __name__ == '__main__':
     kindle = RemoteDisplay(weather,**dimensions)
 
     # convert regular string weather into ascii image
-    kindle.asciiDisplay(pollutants)
+    try:
+      kindle.asciiDisplay(pollutants)
+    except Exception:
+      sys.exit("RemoteDisplay error")
 
     credentials = {}
     for i in ('user','password','address','port'):

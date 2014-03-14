@@ -9,7 +9,6 @@ from BeautifulSoup import BeautifulSoup
 class Weather:
   def __init__(self,
                location="autoip",
-               pollutionLocation=None,
                apiKey=None):
 
     options="conditions/forecast"
@@ -24,63 +23,6 @@ class Weather:
       self.data = json.loads(wundergroundResponse)
     except Exception:
       self.data = None
-
-    try:
-#      aqicnResponse = urllib2.urlopen("http://aqicn.org/?city="
-#                                      + pollutionLocation
-#                                      + "&size=xlarge")
-      aqicnResponse = urllib2.urlopen("http://aqicn.org/city/"
-                                      + pollutionLocation
-                                      + "/m")
-      self.aqicn = BeautifulSoup(aqicnResponse.read())
-#     EPA table for conversion between AQI and uq/m3 for PM2.5
-#     C_low | C_high | I_low | I_high | Category
-#     0     | 12.0   | 0     | 50     | Good
-#     12.1  | 35.4   | 51    | 100    | Moderate
-#     35.5  | 55.4   | 101   | 150    | Unhealthy for Sensitive
-#     55.5  | 150.4  | 151   | 200    | Unhealthy
-#     150.5 | 250.4  | 201   | 300    | Very Unhealty
-#     250.5 | 350.4  | 301   | 400    | Hazardous
-#     350.5 | 500.4  | 401   | 500    | Hazardous
-      self.EPAtable = {
-                       'pm25': ( (0    ,12.0 ,0  ,50 ,'Good'),
-                                 (12.1 ,35.4 ,51 ,100,'Moderate'),
-                                 (35.5 ,55.4 ,101,150,'Unhealthy for Some Groups'),
-                                 (55.5 ,150.4,151,200,'Unhealthy'),
-                                 (150.5,250.4,201,300,'Very Unhealthy'),
-                                 (250.5,500.4,301,500,'Hazardous')),
-
-                       'pm10': ( (0  ,54 ,0  ,50 ,'Good'),
-                                 (55 ,154,51 ,100,'Moderate'),
-                                 (155,254,101,150,'Unhealthy for Some Groups'),
-                                 (255,354,151,200,'Unhealthy'),
-                                 (355,424,201,300,'Very Unhealthy'),
-                                 (425,604,301,500,'Hazardous') ),
-
-                       'no2' : ( (0   ,53  ,0  ,50 ,'Good'),
-                                 (54  ,100 ,51 ,100,'Moderate'),
-                                 (101 ,360 ,101,150,'Unhealthy for Some Groups'),
-                                 (361 ,649 ,151,200,'Unhealthy'),
-                                 (650 ,1249,201,300,'Very Unhealthy'),
-                                 (1250,2049,301,500,'Hazardous') ),
-
-                       'so2' : ( (0  ,35  ,0  ,50 ,'Good'),
-                                 (36 ,75  ,51 ,100,'Moderate'),
-                                 (76 ,185 ,101,150,'Unhealthy for Some Groups'),
-                                 (186,304 ,151,200,'Unhealthy'),
-                                 (305,604 ,201,300,'Very Unhealthy'),
-                                 (605,1004,301,500,'Hazardous') ),
-
-                       'co'  : ( (0   ,4.4 ,0  ,50 ,'Good'),
-                                 (4.5 ,9.4 ,51 ,100,'Moderate'),
-                                 (9.5 ,12.4,101,150,'Unhealthy for Some Groups'),
-                                 (12.5,15.4,151,200,'Unhealthy'),
-                                 (15.5,30.4,201,300,'Very Unhealthy'),
-                                 (30.5,50.4,301,500,'Hazardous') )
-                      }
-
-    except Exception:
-      self.aqicn = None
 
   def conditions(self):
     if self.data == None:
@@ -129,74 +71,8 @@ class Weather:
 
     }
 
-  def pollution(self):
-    if self.aqicn == None:
-      return {
-        "pm10"        : "--",
-        "pm25"        : "--",
-        "no2"         : "--",
-        "so2"         : "--",
-        "co"          : "--"
-      }
-
-    try:
-      pm10 =  self.aqicn.find('td', attrs={'id':'cur_pm10'}).div.contents[0]
-      pm25 =  self.aqicn.find('td', attrs={'id':'cur_pm25'}).div.contents[0]
-      no2  =  self.aqicn.find('td', attrs={'id':'cur_no2'} ).div.contents[0]
-      so2  =  self.aqicn.find('td', attrs={'id':'cur_so2'} ).div.contents[0]
-      co   =  self.aqicn.find('td', attrs={'id':'cur_co'}  ).div.contents[0]
-    except Exception:
-      pm10 = -1
-      pm25 = -1
-      no2  = -1
-      so2  = -1
-      co   = -1
-
-    return {
-      "pm10" : pm10,
-      "pm25" : pm25,
-      "no2"  : no2,
-      "so2"  : so2,
-      "co"   : co
-    }
-
-  def pollution2(self,pollutant='pm10'):
-    # pollutant = pm10, pm25, no2, so2, co
-    # unit = ug/m3
-    if self.aqicn == None:
-      return "--"
-    
-    try:
-      value = self.aqicn.find('td', attrs={'id':"cur_" + pollutant}).div.contents[0]
-  
-      level=(0,0,0,0,0)
-      for row in self.EPAtable[pollutant]:
-        if row[2] < int(value) and int(value) < row[3]:
-          level=row
-          break
-    except Exception:
-      return {
-        'value'      : -1,
-        'conditions' : 'error'
-      }
-
-# C = (AQI - I_low) * ( C_high - C_low ) / ( I_high - I_low ) + C_low
-    try:
-      ug = ( int(value) - level[2] )*( level[1] - level[0] )/( level[3] - level[2]) + level[0]
-    except Exception:
-      ug = 0
-
-    return { 
-      'value'      : int(ug),
-      'conditions' : level[4]
-    }
-
-
 if __name__ == '__main__':
   from pprint import pprint
-  #w = Weather("PL/Krakow","Poland/Ma%C5%82opolska/Krak%C3%B3w/AlejaKrasi%C5%84skiego","fecfc874ac6ad136")
-  w = Weather("PL/Krakow","poland/malopolska/krakow/aleja-krasinskiego","fecfc874ac6ad136")
+  w = Weather("PL/Krakow","fecfc874ac6ad136")
   pprint(w.conditions())
   pprint(w.forecast())
-#  pprint(w.pollution())
-  pprint(w.pollution2('pm10'))

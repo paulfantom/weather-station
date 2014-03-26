@@ -3,15 +3,18 @@
 import urllib2
 import urllib
 import json
-from BeautifulSoup import BeautifulSoup
+import time
+#from BeautifulSoup import BeautifulSoup
 
 
 class Weather:
   def __init__(self,
                location="autoip",
-               apiKey=None):
+               apiKey=None,
+               tmpFile=None):
 
     options="conditions/forecast"
+    self.tmpFile = tmpFile
     try:
       wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
                                              + apiKey
@@ -24,55 +27,71 @@ class Weather:
     except Exception:
       self.data = None
 
-  def conditions(self):
+  def __save(self,data):
+    try:
+      with open(self.tmpFile,"r") as fileContent:
+        cur = json.load(fileContent)
+    except IOError:
+      cur = None
+    
+    try:
+      if 'conditions' in data.keys():
+        data['forecast'] = cur['forecast']
+      else:
+        data['conditions'] = cur['conditions']
+    except Exception:
+      pass
+
+    data['reading date'] = time.strftime("%Y-%m-%d %X")
+
+    with open(self.tmpFile,"w") as fileContent:
+      json.dump(data,fileContent,indent=2,sort_keys=True)
+
+  def conditions(self,save=None):
     if self.data == None:
       return None
-    current = self.data["current_observation"]
-    return {
-      'temp'     :     current["temp_c"],
-      'humidity' :     current["relative_humidity"],
-      'feeltemp' :     current["feelslike_c"],
-      'pressure' :     current["pressure_mb"],
-      'presTrend': str(current["pressure_trend"]),
-      'sky'      : str(current["weather"]),
-      'wind_mph' : int(current["wind_mph"]),
-      'wind_kph' : int(current["wind_kph"])
-    }
+    observation = self.data["current_observation"]
+    formatedObservation = {
+                            'temp'     :     observation["temp_c"],
+                            'humidity' :     observation["relative_humidity"],
+                            'feeltemp' :     observation["feelslike_c"],
+                            'pressure' :     observation["pressure_mb"],
+                            'presTrend': str(observation["pressure_trend"]),
+                            'sky'      : str(observation["weather"]),
+                            'sky_icon' : str(observation["icon_url"]),
+                            'wind_mph' : int(observation["wind_mph"]),
+                            'wind_kph' : int(observation["wind_kph"])
+                          }
+    if self.tmpFile:
+      self.__save({'conditions' : formatedObservation})
+
+    return formatedObservation
+
 
   def forecast(self):
     if self.data == None:
       return None
     forecast = self.data["forecast"]["simpleforecast"]["forecastday"]
-    return {
-      "today": {
-        'temp_high' :     forecast[0]["high"]["celsius"],
-        'temp_low'  :     forecast[0]["low"]["celsius"],
-        'humidity'  :     forecast[0]["avehumidity"],
-        'sky'       : str(forecast[0]["conditions"]),
-        'wind_mph'  : int(forecast[0]["avewind"]["mph"]),
-        'wind_kph'  : int(forecast[0]["avewind"]["kph"])
-        },
-      "tomorrow": {
-       'temp_high'  :     forecast[1]["high"]["celsius"],
-       'temp_low'   :     forecast[1]["low"]["celsius"],
-       'humidity'   :     forecast[1]["avehumidity"],
-       'sky'        : str(forecast[1]["conditions"]),
-       'wind_mph'   : int(forecast[1]["avewind"]["mph"]),
-       'wind_kph'   : int(forecast[1]["avewind"]["kph"])
-       },
-      "dayafter": {
-       'temp_high'  :     forecast[2]["high"]["celsius"],
-       'temp_low'   :     forecast[2]["low"]["celsius"],
-       'humidity'   :     forecast[2]["avehumidity"],
-       'sky'        : str(forecast[2]["conditions"]),
-       'wind_mph'   : int(forecast[2]["avewind"]["mph"]),
-       'wind_kph'   : int(forecast[2]["avewind"]["kph"])
-       }
+    formatedForecast = { 'today'    : 0,
+                         'tomorrow' : 1,
+                         'dayafter' : 2}
+    for key,val in formatedForecast.iteritems():
+      formatedForecast[key] ={
+                              'temp_high' :     forecast[val]["high"]["celsius"],
+                              'temp_low'  :     forecast[val]["low"]["celsius"],
+                              'humidity'  :     forecast[val]["avehumidity"],
+                              'sky'       : str(forecast[val]["conditions"]),
+                              'sky_icon'  : str(forecast[val]["icon_url"]),
+                              'wind_mph'  : int(forecast[val]["avewind"]["mph"]),
+                              'wind_kph'  : int(forecast[val]["avewind"]["kph"])
+                             }
+    if self.tmpFile:
+      self.__save({'forecast' : formatedForecast})
+    return formatedForecast
 
-    }
 
 if __name__ == '__main__':
   from pprint import pprint
-  w = Weather("PL/Krakow","fecfc874ac6ad136")
-  pprint(w.conditions())
-  pprint(w.forecast())
+  weather = Weather("PL/Krakow","fecfc874ac6ad136","tmp")
+  pprint(weather.conditions())
+  pprint(weather.forecast())

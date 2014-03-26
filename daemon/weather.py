@@ -11,10 +11,11 @@ class Weather:
   def __init__(self,
                location="autoip",
                apiKey=None,
-               tmpFile=None):
+               tmpFile=False):
 
     options="conditions/forecast"
-    self.tmpFile = tmpFile
+    if tmpFile:
+      self.tmpFile = "/tmp/weatherStation.tmp"
     try:
       wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
                                              + apiKey
@@ -92,6 +93,6 @@ class Weather:
 
 if __name__ == '__main__':
   from pprint import pprint
-  weather = Weather("PL/Krakow","fecfc874ac6ad136","tmp")
+  weather = Weather("PL/Krakow","fecfc874ac6ad136")
   pprint(weather.conditions())
   pprint(weather.forecast())

@@ -1,0 +1,9 @@
+{
+	"items": [
+		{
+     "name": "Weather station",
+     "priority": -1, 
+     "action": "/mnt/us/extensions/WeatherStation/bin/do_magic.sh"
+     }
+	]
+}

@@ -219,7 +219,6 @@ class Blocks():
 
 
 if __name__ == '__main__':
-  from weather import Weather
   from pyfiglet import Figlet
   from pprint import pprint
   from re import sub
@@ -242,6 +241,7 @@ if __name__ == '__main__':
 
   one = Blocks(bigFont.renderText("Kurwa"))
   two = Blocks(smallFont.renderText("Dupa"))
-  one.imagine(debug=True)
-  two.imagine(debug=True)
+#  one.imagine(debug=True)
+#  two.imagine(debug=True)
   display = Blocks.join(one,two)
+  display.imagine()

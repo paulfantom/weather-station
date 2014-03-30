@@ -45,15 +45,15 @@ class Block():
   # public:
   def text(self,
            value,
-           font="/usr/share/fonts/dejavu/DejaVuSans.ttf",
+           fontPath="/usr/share/fonts/dejavu/DejaVuSans.ttf",
            horizontal="center",
            vertical="center",
            fontSize="max"):
 
     if fontSize == "max":
-      font = self.__maxFont(value,font)
+      font = self.__maxFont(value,fontPath)
     else:
-      font = ImageFont.truetype(font,fontSize)
+      font = ImageFont.truetype(fontPath,fontSize)
 
     textSize = self.area.textsize(value,font)
 

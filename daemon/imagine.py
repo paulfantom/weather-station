@@ -11,17 +11,17 @@ class Block():
     self.area  = ImageDraw.Draw(self.block)
 
   def __maxFont(self,text,path):
-    size = 0
+    fontSize = 0
     while True:
-      size += 2
-      font = ImageFont.truetype(path,size)
-      if font.getsize(text)[0] > self.block.size[0]:
-        font = ImageFont.truetype(path,size-2)
+      fontSize += 2
+      font = ImageFont.truetype(path,fontSize)
+      if font.getsize(text)[0] > self.block.size[0] :
+        font = ImageFont.truetype(path,fontSize-2)
         break
 
-    while font.getsize(text)[1] > self.block.size[1]:
-      size -= 2
-      font = ImageFont.truetype(path,size)
+    while font.getsize(text)[1] > self.block.size[1] / 3:
+      fontSize -= 2
+      font = ImageFont.truetype(path,fontSize)
 
     return font
 
@@ -31,19 +31,20 @@ class Block():
                  rectangleSize=(0,0),
                  offset=(0,0)):
     if   horizontal == "center":
-      x = ( int(self.block.size[0]) - rectangleSize[0] ) / 2
+      x = ( self.block.size[0] - rectangleSize[0] ) / 2
     elif horizontal == "right":
-      x =   int(self.block.size[0]) - rectangleSize[0]
+      x =   self.block.size[0] - rectangleSize[0]
     else:         # == "left"
       x = 0
 
     if   vertical == "center":
-      y = ( int(self.block.size[1]) - rectangleSize[1] ) / 2
-    elif vertical == "down":  #FIXME
-      y =   self.block.size[1] - rectangleSize[1] - int(rectangleSize[1]/3) # WUT?
+      y = ( self.block.size[1] - rectangleSize[1] ) / 2
+    elif vertical == "down":
+      y =   self.block.size[1] - rectangleSize[1]
     else:       # == "up"
       y = 0
 
+    y -= int(rectangleSize[1]/4) #FIXME
     return (int(x+offset[0]),int(y+offset[1]))
 
   ### -------------------- ###
@@ -122,11 +123,11 @@ class Block():
 
 
 if __name__ == '__main__':
-  img = Block((200,300),128)
+  img = Block((300,200),128)
   img2 = Block((300,200),255)
-  img.text("temp\n---\n89deg",vertical="down")
+  img2.text("Success")
+  img.text("Test\nended\nwith:")
 #  img.text("8deg",vertical="down")
-  img.join(img2)
+  img.join(img2,"down")
   img.show()
 #  img.show()
-

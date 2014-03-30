@@ -29,11 +29,14 @@ class Block():
     return (int(x),int(y))
 
   def __maxFont(self,text,path):
-    size = 12
-    font = ImageFont.truetype(path,size)
-    while font.getsize(text)[0] < self.block.size[0] - 1:
+    size = 10
+    while True:
       size += 2
       font = ImageFont.truetype(path,size)
+      if font.getsize(text)[0] > self.block.size[0]:
+        font = ImageFont.truetype(path,size-2)
+        break
+
     while font.getsize(text)[1] > self.block.size[1]:
       size -= 2
       font = ImageFont.truetype(path,size)
@@ -67,7 +70,7 @@ class Block():
 
 
 if __name__ == '__main__':
-  rect = Block((400,100))
-  rect.text("hellodupa")
-  rect.show()
+  img = Block((400,100))
+  img.text("test image text")
+  img.show()
 

@@ -93,8 +93,29 @@ class Block():
       self.area.text(xy,line,fill=colour,font=font)
 
   def join(self,another,orientation="right"):
-    return self
+    background = min(self.background,another.background)
+    if orientation == "up" or orientation == "down":
+      x = max(self.block.size[0], another.block.size[0])
+      y = self.block.size[1] + another.block.size[1]
+    else:
+      x = self.block.size[0] + another.block.size[0]
+      y = max(self.block.size[1], another.block.size[1])
 
+    new = Image.new("L",(x,y),background)
+    if   orientation == "up":
+      new.paste(self.block,(0,another.block.size[1]))
+      new.paste(another.block,(0,0))
+    elif orientation == "down":
+       new.paste(self.block,(0,0))
+       new.paste(another.block,(0,self.block.size[1]))
+    elif orientation == "left":
+      new.paste(self.block,(another.block.size[0],0))
+      new.paste(another.block,(0,0))
+    else:          # == "right"
+      new.paste(self.block,(0,0))
+      new.paste(another.block,(self.block.size[0],0))
+
+    self.block = new
 
   def show(self):
     self.block.show()
@@ -102,7 +123,10 @@ class Block():
 
 if __name__ == '__main__':
   img = Block((200,300),128)
+  img2 = Block((300,200),255)
   img.text("temp\n---\n89deg",vertical="down")
 #  img.text("8deg",vertical="down")
+  img.join(img2)
   img.show()
+#  img.show()
 

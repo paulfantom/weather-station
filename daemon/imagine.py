@@ -10,7 +10,7 @@ class Block():
     self.block = Image.new("L",size,background)
     self.area  = ImageDraw.Draw(self.block)
 
-  def __maxFont(self,text,path):
+  def __maxFont(self,text,path,lines=1):
     fontSize = 0
     while True:
       fontSize += 2
@@ -19,7 +19,7 @@ class Block():
         font = ImageFont.truetype(path,fontSize-2)
         break
 
-    while font.getsize(text)[1] > self.block.size[1] / 3:
+    while font.getsize(text)[1] > self.block.size[1] / lines:
       fontSize -= 2
       font = ImageFont.truetype(path,fontSize)
 
@@ -44,7 +44,7 @@ class Block():
     else:       # == "up"
       y = 0
 
-    y -= int(rectangleSize[1]/4) #FIXME
+    y -= int(rectangleSize[1]/4) #FIXME dafuq is this???
     return (int(x+offset[0]),int(y+offset[1]))
 
   ### -------------------- ###
@@ -63,7 +63,7 @@ class Block():
     value = value.splitlines()
 
     if fontSize == "max":
-      font = self.__maxFont(max(value,key=len),fontPath)
+      font = self.__maxFont(max(value,key=len),fontPath,len(value))
     else:
       font = ImageFont.truetype(fontPath,fontSize)
 

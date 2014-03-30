@@ -2,12 +2,16 @@
 from PIL import Image,ImageDraw,ImageFont
 
 class Block():
-  def __init__(self,size,background=0):
+  def __init__(self,size,background=0,path=None):
     if background > 255:
       self.background = 255
     else:
       self.background = background
-    self.block = Image.new("L",size,background)
+
+    if path:
+      self.block = Image.open(path)
+    else:
+      self.block = Image.new("L",size,background)
     self.area  = ImageDraw.Draw(self.block)
 
   def __maxFont(self,text,path,lines=1):
@@ -121,13 +125,14 @@ class Block():
   def show(self):
     self.block.show()
 
+  def save(self,path):
+    path += ".png"
+    self.block.save(path,"png")
 
 if __name__ == '__main__':
   img = Block((300,200),128)
   img2 = Block((300,200),255)
   img2.text("Success")
   img.text("Test\nended\nwith:")
-#  img.text("8deg",vertical="down")
   img.join(img2,"down")
   img.show()
-#  img.show()

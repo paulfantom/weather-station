@@ -34,6 +34,9 @@ location = PL/Krakow
 # ==== REMOTE DISPLAY ========
 [screen]
 # send current weather and weather forecast to remote display (ex. Kindle)
+# screen type list, comma separated
+# options: kindle,web (default: kindle)
+# type = kindle
 #
 # remote screen size:
 # width (default: 100)

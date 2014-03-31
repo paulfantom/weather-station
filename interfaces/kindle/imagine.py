@@ -69,8 +69,8 @@ class Block():
       fontSize = None
 
     fonts = {}
-    for i in value:
-      font = self.__maxFont(i,fontPath,fontSize,linesCount)
+    for line in value:
+      font = self.__maxFont(line,fontPath,fontSize,linesCount)
       fonts = dict(fonts.items() + font.items())
 
     minimal = min(fonts.keys(), key = lambda t:t[1])
@@ -147,9 +147,9 @@ class Block():
     self.block.save(path,"png")
 
 if __name__ == '__main__':
-  img = Block((300,100),128)
-  img2 = Block((200,200),255)
-  img2.text("Success\nasdfadsf\nadsgfdgdfs\n9")
-  img.text("9 C \n9 km/h",horizontal="center")
-  img.join(img2,"right")
+  img = Block((300,200),128)
+  img2 = Block((200,200),0)
+  img.text("Success")
+  img2.text("Congratulations\nIt works!",horizontal="center")
+  img.join(img2,"down")
   img.show()

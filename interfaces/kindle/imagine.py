@@ -51,6 +51,19 @@ class Block():
     y -= int(rectangleSize[1]/4) #FIXME dafuq is this???
     return (int(x+offset[0]),int(y+offset[1]))
 
+  def __margin(self,another,axis='x',justify="center"):
+    if axis == 'x':
+      axis = 0
+    else:
+      axis = 1
+    if self.block.size[axis] < another.block.size[axis]:
+      a = max(self.block.size[axis],another.block.size[axis])
+      b = min(self.block.size[axis],another.block.size[axis])
+      return (a - b) / 2
+    else:
+      return 0
+    
+
   ### -------------------- ###
   def text(self,
            value,
@@ -90,7 +103,10 @@ class Block():
           multipliers[i] = i - int(len(value)/2)
       else: # even number
         for i in range(len(value)):
-          multipliers[i] = i - 0.5
+          if i%2 == 0:
+            multipliers[i] = -0.5*i - 0.5
+          else:
+            multipliers[i] = 0.5*i
 
     for idx,line in enumerate(value):
       offset = multipliers[idx]*textSize[1]
@@ -98,9 +114,9 @@ class Block():
       self.area.text(xy,line,fill=colour,font=font)
     return self
 
-  def join(self,another,orientation="right",leave=False):
-    background = min(self.background,another.background)
-    if orientation == "up" or orientation == "down":
+  def join(self,another,where="right"):
+    background = max(self.background,another.background)
+    if where == "up" or where == "down":
       x = max(self.block.size[0], another.block.size[0])
       y = self.block.size[1] + another.block.size[1]
     else:
@@ -108,18 +124,18 @@ class Block():
       y = max(self.block.size[1], another.block.size[1])
 
     new = Image.new("L",(x,y),background)
-    if   orientation == "up":
-      new.paste(self.block,(0,another.block.size[1]))
-      new.paste(another.block,(0,0))
-    elif orientation == "down":
-       new.paste(self.block,(0,0))
-       new.paste(another.block,(0,self.block.size[1]))
-    elif orientation == "left":
-      new.paste(self.block,(another.block.size[0],0))
-      new.paste(another.block,(0,0))
+    if   where == "up":
+      new.paste(self.block,   (self.__margin(another,'x'),another.block.size[1]))
+      new.paste(another.block,(another.__margin(self,'x'),0                    ))
+    elif where == "down":
+       new.paste(self.block,   (self.__margin(another,'x'),0                 ))
+       new.paste(another.block,(another.__margin(self,'x'),self.block.size[1]))
+    elif where == "left":
+      new.paste(self.block,   (another.block.size[0],self.__margin(another,'y')))
+      new.paste(another.block,(0                    ,another.__margin(self,'y')))
     else:          # == "right"
-      new.paste(self.block,(0,0))
-      new.paste(another.block,(self.block.size[0],0))
+      new.paste(self.block,   (0                 ,self.__margin(another,'y')))
+      new.paste(another.block,(self.block.size[0],another.__margin(self,'y')))
 
     self.block = new
   
@@ -139,9 +155,9 @@ class Block():
     self.block.save(path,"png")
 
 if __name__ == '__main__':
-  img = Block((300,200),128)
-  img2 = Block((300,200),255)
+  img = Block((300,100),128)
+  img2 = Block((200,200),255)
   img2.text("Success")
-  img.text("9 C \n 9 km/h",vertical="center")
-  img.join(img2,"down")
+  img.text("9 C \n9 km/h",vertical="center")
+  img.join(img2,"right")
   img.show()

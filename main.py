@@ -8,7 +8,7 @@ if __name__ == '__main__':
   from pprint import pprint
 
   config = Configuration(path='./config')
-#  weather = Weather(config.getLocation(),config.getKey(),False)
+  weather = Weather(config.getLocation(),config.getKey(),False)
   try:
     interfaces = config.getType()
   except Exception:
@@ -17,5 +17,9 @@ if __name__ == '__main__':
 
   if   interfaces.find("kindle") != -1:
     from interfaces.kindle.remote import RemoteDisplay
+    import interfaces.kindle.screen as screen
+    path = screen.create(weather)
+    kindle = RemoteDisplay(path)
+    kindle.auto()
   if interfaces.find("web") != -1:
     pass

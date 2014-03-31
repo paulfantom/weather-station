@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-from PIL import Image,ImageDraw,ImageFont
+from PIL import Image,ImageDraw,ImageFont,ImageOps
 
 class Block():
-  def __init__(self,size,background=0,path=None):
+  def __init__(self,size=(0,0),background=255,path=None):
     if background > 255:
       self.background = 255
     else:
@@ -90,14 +90,15 @@ class Block():
           multipliers[i] = i - int(len(value)/2)
       else: # even number
         for i in range(len(value)):
-          multipliers[i] = 1
+          multipliers[i] = i - 0.5
 
     for idx,line in enumerate(value):
       offset = multipliers[idx]*textSize[1]
       xy = self.__position(horizontal,vertical,textSize,(0,offset))
       self.area.text(xy,line,fill=colour,font=font)
+    return self
 
-  def join(self,another,orientation="right"):
+  def join(self,another,orientation="right",leave=False):
     background = min(self.background,another.background)
     if orientation == "up" or orientation == "down":
       x = max(self.block.size[0], another.block.size[0])
@@ -121,6 +122,14 @@ class Block():
       new.paste(another.block,(self.block.size[0],0))
 
     self.block = new
+  
+  def grayscale(self,background=None):
+    self.block = self.block.convert('L')
+    if not background:
+      background = self.background
+    if background < 128:
+      img = self.block
+      self.block = ImageOps.invert(img)
 
   def show(self):
     self.block.show()
@@ -133,6 +142,6 @@ if __name__ == '__main__':
   img = Block((300,200),128)
   img2 = Block((300,200),255)
   img2.text("Success")
-  img.text("Test\nended\nwith:")
+  img.text("9 C \n 9 km/h",vertical="center")
   img.join(img2,"down")
   img.show()

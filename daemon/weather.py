@@ -16,6 +16,8 @@ class Weather:
     options="conditions/forecast"
     if tmpFile:
       self.tmpFile = "/tmp/weatherStation.tmp"
+    else:
+      self.tmpFile = False
     try:
       wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
                                              + apiKey
@@ -48,7 +50,7 @@ class Weather:
     with open(self.tmpFile,"w") as fileContent:
       json.dump(data,fileContent,indent=2,sort_keys=True)
 
-  def conditions(self,save=None):
+  def conditions(self,save=False):
     if self.data == None:
       return None
     observation = self.data["current_observation"]
@@ -63,13 +65,13 @@ class Weather:
                             'wind_mph' : int(observation["wind_mph"]),
                             'wind_kph' : int(observation["wind_kph"])
                           }
-    if self.tmpFile:
+    if save:
       self.__save({'conditions' : formatedObservation})
+    else:
+      return formatedObservation
 
-    return formatedObservation
 
-
-  def forecast(self):
+  def forecast(self,save=False):
     if self.data == None:
       return None
     forecast = self.data["forecast"]["simpleforecast"]["forecastday"]
@@ -84,15 +86,27 @@ class Weather:
                               'sky'       : str(forecast[val]["conditions"]),
                               'sky_icon'  : str(forecast[val]["icon_url"]),
                               'wind_mph'  : int(forecast[val]["avewind"]["mph"]),
-                              'wind_kph'  : int(forecast[val]["avewind"]["kph"])
+                              'wind_kph'  : int(forecast[val]["avewind"]["kph"]),
+                              'weekday'   :     forecast[val]["date"]["weekday_short"]
                              }
-    if self.tmpFile:
+    if save:
       self.__save({'forecast' : formatedForecast})
-    return formatedForecast
+    else:
+      return formatedForecast
+
+  def save(self,conditions=True,forecast=False):
+    if self.tmpFile:
+      if conditions:
+        self.conditions(True)
+      if forecast:
+        self.forecast(True)
+    else:
+      print ("Cannot save forecast to file")
+    
 
 
 if __name__ == '__main__':
   from pprint import pprint
   weather = Weather("PL/Krakow","fecfc874ac6ad136")
-  pprint(weather.conditions())
+#  pprint(weather.conditions())
   pprint(weather.forecast())

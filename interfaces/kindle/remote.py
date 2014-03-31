@@ -1,21 +1,13 @@
 #!/usr/bin/env python
 
-#from re       import sub
-from imagine import Block
 import paramiko
 import os
 
 class RemoteDisplay:
   
-  def __init__(self,weather,x=600,y=800):
-    self.x = x
-    self.y = y
-    self.weather   = weather
-    self.tmp       ='/tmp/weather'
+  def __init__(self,screen):
+    self.screen    = screen
     self.ssh       = paramiko.SSHClient()
-
-  def draw():
-    return
 
   def connect(self,user='root',password='toor',address='192.168.2.2',port=22):
     self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -31,40 +23,48 @@ class RemoteDisplay:
       #                 port=self.port
       #                 timeout=4)
     except Exception:
-      print "Cannot connect do remote device"
+      print ( "Cannot connect do remote device" )
 
-  def send(self,where='/mnt/us/extensions/bin/'):
+  def send(self,where='/mnt/us/extensions/WeatherStation/bin/screen.png'):
     try:
       sftp = self.ssh.open_sftp()
     except Exception:
-      print "Display not updated"
+      print ( "Display not updated" )
       return
+    try:
+      sftp.put(self.screen,where)
+      command = '/usr/sbin/eips -g ' + where
+    except OSError:
+      where = '/mnt/us/extensions/WeatherStation/bin/TARDIS.jpg'
+      
+    command = '/usr/sbin/eips -g ' + where
+    (stdin, stdout, stderr) = self.ssh.exec_command(command)
 
-    sftp.put(self.tmp,where)
 
-  def clear(self):
+  def quit(self):
+    command = '/usr/sbin/eips -g /mnt/us/extensions/WeatherStation/bin/TARDIS.jpg'
+    (stdin, stdout, stderr) = self.ssh.exec_command(command)
+    self.close()
+
+  def close(self):
     self.ssh.close()
     try:
-      os.remove(self.tmp)
-    except OSError, e:
-      print "Couldn't remove temporary file"
+      os.remove(self.screen)
+    except OSError:
+      print ( "Couldn't remove temporary file" )
 
   def auto(self):
-    self.asciiDisplay(None)
     self.connect()
     self.send()
-    self.clear()
+    self.close()
 
 
 if __name__ == '__main__':
 
-  from pprint import pprint
-
-  location = 'PL/Krakow'
-  API_KEY="fecfc874ac6ad136"
-  weather   = Weather(location,'a',API_KEY)
-  pprint(weather)
-
-  #kindle = RemoteDisplay(weather)
-  #kindle = draw(weather)
-  #kindle.auto()
+  kindle = RemoteDisplay('./pic.png')
+  kindle.auto()
+  try:
+    if kindle:
+      del kindle
+  except NameError:
+    pass

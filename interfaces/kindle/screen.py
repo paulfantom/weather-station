@@ -48,8 +48,9 @@ def create(weather,size=(600,800)):
 #  screen.join(ico,"down")
 
   temperature = Block((size[0]/2,size[1]/2 - size[1]/20 - icoSize[1]))
-  value = " " + str(weather.conditions()['temp']) + "C  "
+  value = str(weather.conditions()['temp']) + "C  "
   temperature.text(value)
+  temperature.show()
 
   screen.join(temperature,"down")
 

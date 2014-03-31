@@ -25,21 +25,22 @@ class Block():
       
     fontSize = 200
     border = (self.block.size[0],self.block.size[1] / lines)
-    range = 50
     for dim in (1,0):
+      step = 100
       i = 1
       while True:
         font = ImageFont.truetype(path,fontSize)
         height = font.getsize(text)[dim]
-        if   height < border[dim] - 6:
-          fontSize += range/i
-        elif height > border[dim]:
-          fontSize -= range/i
+        if   height < border[dim] - 8:
+          fontSize += step/i
+        elif height >= border[dim]:
+          fontSize -= step/i
         else:
           break
         i +=1
         if i > 31:
           break
+#        print dim,i,fontSize,height,border[dim%2]
 
 
 #    if not fontSize:
@@ -173,9 +174,9 @@ class Block():
     self.block.save(path,"png")
 
 if __name__ == '__main__':
-  img = Block((300,200),128)
-  img2 = Block((200,200),0)
-  img.text("Success")
-  img2.text("Congratulations\nIt works!",horizontal="center")
-  img.join(img2,"down")
+  img = Block((300,360),128)
+#  img2 = Block((200,200),0)
+  img.text("10 C ")
+#  img2.text("Congratulations\nIt works!",horizontal="center")
+#  img.join(img2,"down")
   img.show()

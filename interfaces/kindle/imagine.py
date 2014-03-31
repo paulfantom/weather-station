@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from PIL import Image,ImageDraw,ImageFont,ImageOps
+import sys
 
 class Block():
   def __init__(self,size=(0,0),background=255,path=None):
@@ -15,19 +16,45 @@ class Block():
 #    self.area  = ImageDraw.Draw(self.block)
 
   def __maxFont(self,text,path,fontSize,lines=1):
-    if not fontSize:
-      fontSize = 4
+    border = (self.block.size[0],self.block.size[1] / lines)
+    if fontSize:
+      font  = ImageFont.truetype(path,fontSize)
+      fsize = font.getsize(text)
+      if fsize[0] < border[0] and fsize[1] < border[1]:
+        return { fsize : font }
+      
+    fontSize = 200
+    border = (self.block.size[0],self.block.size[1] / lines)
+    range = 50
+    for dim in (1,0):
+      i = 1
+      while True:
+        font = ImageFont.truetype(path,fontSize)
+        height = font.getsize(text)[dim]
+        if   height < border[dim] - 6:
+          fontSize += range/i
+        elif height > border[dim]:
+          fontSize -= range/i
+        else:
+          break
+        i +=1
+        if i > 31:
+          break
+        print height,fontSize,i
 
-    font = ImageFont.truetype(path,fontSize)
-    while font.getsize(text)[1] < (self.block.size[1] / lines):
-      font = ImageFont.truetype(path,fontSize)
-      fontSize += 2
 
-    font = ImageFont.truetype(path,fontSize-6)
+#    if not fontSize:
+#      fontSize = 4
 
-    while font.getsize(text)[0] > self.block.size[0]:
-      fontSize -= 2
-      font = ImageFont.truetype(path,fontSize)
+#    while font.getsize(text)[1] < (self.block.size[1] / lines):
+#      font = ImageFont.truetype(path,fontSize)
+#      fontSize += 2
+#
+#    font = ImageFont.truetype(path,fontSize-6)
+
+#    while font.getsize(text)[0] > self.block.size[0]:
+#      fontSize -= 2
+#      font = ImageFont.truetype(path,fontSize)
 
     return { font.getsize(text) : font }
 

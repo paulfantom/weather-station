@@ -48,19 +48,18 @@ def create(weather,size=(600,800)):
 #  screen.join(ico,"down")
 
   temperature = Block((size[0]/2,size[1]/2 - size[1]/20 - icoSize[1]))
-  value = str(weather.conditions()['temp']) + "C  "
+  value = str(weather.conditions()['temp']) + "C"
   temperature.text(value)
-  temperature.show()
 
   screen.join(temperature,"down")
 
   wind = Block((size[0]/2,size[1]/4 - size[1]/10 - size[1]/20))
-  wind.text(" " + str(weather.conditions()['wind_kph']) + " km/h ")
+  wind.text(str(weather.conditions()['wind_kph']) + " km/h")
 
   screen.join(wind,"down")
 
 #  feelTemp = Block((size[0]/2,size[1]/10))
-#  feelTemp.text(" Feels like: " + str(weather.conditions()['feeltemp']) + "C ",fontSize=12)
+#  feelTemp.text("Feels like: " + str(weather.conditions()['feeltemp']) + "C",fontSize=12)
 
 #  temperature.join(feelTemp,"down")
 
@@ -71,7 +70,8 @@ def create(weather,size=(600,800)):
     new.text(" " + weather.forecast()[name]['weekday'] + " ")
     new.join(newIco,"down")
     temp = Block((new.block.size[0],size[1]/8))
-    temp.text(weather.forecast()[name]['temp_high'] + "\n" + \
+    temp.text(weather.forecast()[name]['temp_high'] + \
+              "\n" + \
               "\n" + \
               weather.forecast()[name]['temp_low'])
     new.join(temp,"down")
@@ -83,8 +83,8 @@ def create(weather,size=(600,800)):
   screen.join(days)
 
   pressure = Block((size[0]*3/4,size[1]/8))
-  pressure.text(weather.conditions()['pressure'] + " hpa      ",horizontal='left')
-  trend    = Block((size[0] - pressure.block.size[0],pressure.block.size[1]))
+  pressure.text(weather.conditions()['pressure'] + " hpa",horizontal='left')
+  trend    = Block((size[0] - pressure.block.size[0],size[1]/8))
   trend.text(   weather.conditions()['presTrend'])
   pressure.join(trend,'right')
 

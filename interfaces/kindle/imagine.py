@@ -22,27 +22,36 @@ class Block():
       fsize = font.getsize(text)
       if fsize[0] < border[0] and fsize[1] < border[1]:
         return { fsize : font }
-      
-    fontSize = 200
-    border = (self.block.size[0],self.block.size[1] / lines)
-    for dim in (1,0):
-      step = 100
-      i = 1
-      while True:
-        font = ImageFont.truetype(path,fontSize)
-        height = font.getsize(text)[dim]
-        if   height < border[dim] - 8:
-          fontSize += step/i
-        elif height >= border[dim]:
-          fontSize -= step/i
-        else:
-          break
-        i +=1
-        if i > 31:
-          break
-#        print dim,i,fontSize,height,border[dim%2]
+    
+    fontSize = border[1] * 72 / 96
+    font  = ImageFont.truetype(path,fontSize)
+    if fsize[0] > border[0]:
+      divider  = float(fsize[0])/float(border[0])
+      fontSize = fontSize/divider
+      font = ImageFont.truetype(path,int(fontSize))
+      fsize = font.getsize(text)
 
+#    fontSize = 200
+#    border = (self.block.size[0],self.block.size[1] / lines)
+#    for dim in (1,0):
+#      step = 100
+#      i = 1
+#      while True:
+#        font = ImageFont.truetype(path,fontSize)
+#        height = font.getsize(text)[dim]
+#        if   height < border[dim] - 8:
+#          fontSize += step/i
+#        elif height >= border[dim]:
+#          fontSize -= step/i
+#        else:
+#          break
+#        i +=1
+#        if i > 26:
+#          break
+#        if dim == 0:
+#          print fontSize,height
 
+#####
 #    if not fontSize:
 #      fontSize = 4
 
@@ -56,7 +65,7 @@ class Block():
 #      fontSize -= 2
 #      font = ImageFont.truetype(path,fontSize)
 
-    return { font.getsize(text) : font }
+    return { fsize : font }
 
   def __margin(self,first,second,axis='x',justify="center"):
     if axis == 'x':
@@ -176,7 +185,7 @@ class Block():
 if __name__ == '__main__':
   img = Block((300,360),128)
 #  img2 = Block((200,200),0)
-  img.text("10 C ")
+  img.text("10 C ",fontSize=270)
 #  img2.text("Congratulations\nIt works!",horizontal="center")
 #  img.join(img2,"down")
   img.show()

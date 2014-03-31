@@ -40,7 +40,6 @@ class Block():
         i +=1
         if i > 31:
           break
-        print height,fontSize,i
 
 
 #    if not fontSize:

@@ -15,7 +15,7 @@ import os
 
 def time(screenSize=(600,800)):
   hour = Block((screenSize[0]/2,screenSize[1]/20))
-  hour.text(strftime("%H:%M"),fontSize=16,vertical="down")
+  hour.text(strftime("%H:%M"),fontSize=16,vertical="center")
   return hour
 
 def icon(url):
@@ -69,7 +69,7 @@ def create(weather,size=(600,800),forecastDays=None):
   for i in (wind,pressure):
     tmp = Block((size[0]/2,size[1]/8-icoSize[1]/2))
     tmp.text(i,horizontal="right",vertical="down",fontSize=60)
-    screen.join(tmp,"down","center")
+    screen.join(tmp,"down")
 
   tmp = Block((size[0]/2,icoSize[1]))
   tmp.text(trend,fontSize=16,vertical="up")
@@ -77,11 +77,29 @@ def create(weather,size=(600,800),forecastDays=None):
 
   # time and temperature:
   left = time()
-  temperature = Block((size[0]/2,screen.block.size[1] - left.block.size[1]))
-  temperature.text(str(weather.conditions('temp_c')) + " C ",horizontal = "left")
+  curTemp  = weather.conditions('temp_c')
+  feelTemp = weather.conditions('feelslike_c')
+  if feelTemp == curTemp:
+    y = screen.block.size[1] - left.block.size[1]
+  else:
+    y = screen.block.size[1] - left.block.size[1]*2
+    feels = Block((size[0]/2,tmp.block.size[1]))
+    feels.text("It feels like " + feelTemp + " C",fontSize=16)
+
+  temperature = Block((size[0]/2,y))
+  temperature.text(str(curTemp) + " C ",horizontal = "left")
   left.join(temperature,"down","center")
 
+  if feelTemp == curTemp:
+    left.join(feels,"down","down")
+
   screen.join(left,"left")
+
+  # conditions
+
+  conditions = Block((size[0],size[1]/10))
+  conditions.text(weather.conditions('weather'),vertical='up',fontSize=32)
+  screen.join(conditions,"down")
 
   # forecast
   days = Block()

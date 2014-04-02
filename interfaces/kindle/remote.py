@@ -32,7 +32,6 @@ class RemoteDisplay:
       print ( "Display not updated" )
       return
     try:
-      print self.screen
       sftp.put(self.screen,where)
       command = '/usr/sbin/eips -g ' + where
     except OSError:

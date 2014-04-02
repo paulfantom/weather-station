@@ -16,7 +16,6 @@ import os
 def time(screenSize=(600,800)):
   hour = Block((screenSize[0]/2,screenSize[1]/20))
   hour.text(strftime("%H:%M"),fontSize=16,vertical="down")
-  hour.show()
   return hour
 
 def icon(url):

@@ -13,7 +13,8 @@ class Block():
       self.block = Image.open(path)
     else:
       self.block = Image.new("L",size,background)
-#    self.area  = ImageDraw.Draw(self.block)
+
+    self.size = self.block.size
 
   def __maxFont(self,text,path,fontSize,lines=1):
     border = (self.block.size[0],self.block.size[1] / lines)
@@ -33,6 +34,7 @@ class Block():
       font = ImageFont.truetype(path,int(fontSize))
       fsize = font.getsize(text)
 
+    self.fontSize = fsize
     return { fsize : font }
 
   def __margin(self,first,second,axis='x',justify="center"):

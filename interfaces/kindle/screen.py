@@ -6,55 +6,168 @@ from time    import strftime
 from urllib  import urlopen
 import os
 
-#def __init__(self,size=(600,800),background=128):
-#  self.background = background
-#  self.block      = Block(background=background)
-#  self.iconSize   = (50,50)
-#  self.x          = size[0]
-#  self.y          = size[1]
+class Screen():
+  def __init__(weather,\
+               size=(600,800),\
+               forecastDays=4,\
+               path='./images/screen.png'):
 
-def time(screenSize=(600,800)):
-  hour = Block((screenSize[0]/2,screenSize[1]/20))
-  hour.text(strftime("%H:%M"),fontSize=16,vertical="center")
-  return hour
+    self.path         = path
+    self.iconSize     = (50,50)
+    self.forecastDays = forecastDays
+    if not weather.data:
+      try:
+        image = Block(path=path)
+        message = Block((image.size[0],size[1]-image.size[1]))
+        message.text("Cannot download new weather data\n" + \
+                     "\n" + \
+                     "Check internet connection", \
+                     fontSize=16)
+        self.image.join(message,"down")
+        self.image.save(path)
+      except IOError:
+        print "Cannot download weather data"
+        print "No screen.png file to upload"
+    else:
+      self.image   = Block()
+      self.size    = self.image.size
+      self.weather = weather
 
-def icon(url):
-  splitted = url.split("/")
-  name = splitted[-1]
-  try:
-    path = "./images/" + name.split(".")[0] + ".png"
-    icon = Block(path="./images/" + name.split(".")[0] + ".png")
-  except IOError:
-    splitted[-2] = "j"
-    url = "/".join(splitted)
-    f = open("./images/" + name,'wb')
-    f.write(urlopen(url).read())
-    f.close()
-    name = "./images/" + name
-    icon = Block(path=name)
-    icon.grayscale(0)
-    os.remove(name)
+  def __remove(obj):
+    try:
+      del obj
+    except NameError:
+      pass
 
-  return icon
+  def __time(dimensions):
+#    hour = Block((screenSize[0]/2,screenSize[1]/20))
+    hour = strftime("%H:%M")
+    return Block(dimensions).text(hour,\
+                                  fontSize=16,\
+                                  vertical="center")
+
+  def __icon(url):
+    splitted = url.split("/")
+    name = splitted[-1]
+    try:
+      path = "./images/" + name.split(".")[0] + ".png"
+      icon = Block(path=path)
+    except IOError:
+      splitted[-2] = "j"
+      url = "/".join(splitted)
+      f = open("./images/" + name,'wb')
+      f.write(urlopen(url).read())
+      f.close()
+      path= "./images/" + name
+      icon = Block(path=path)
+      icon.grayscale(0)
+      os.remove(name)
+
+    self.iconSize = icon.block.size
+    icon.save(path)
+    return icon
+
+  def __temperature(dimensions,feel=True):
+    currentTemp = self.weather.conditions('temp_c')
+    if feel:
+      feelTemp = self.weather.conditions('feelslike_c')
+      if feelTemp != currentTemp:
+        dimensions = (dimensions[0],dimensions[1]-self.iconSize[1])
+
+      feels = Block((dimensions[0],self.iconSize[1]))
+      feels.text("It feels like " + " C",fontSize=16)
+
+    temperature = Block(dimensions).text(str(currentTemp) + " C", \ 
+                                         horizontal = "left")
+    try:
+      temperature.join(feels,"down")
+    except AttributeError:
+      pass
+
+    return temperature
+
+  def __windAndPressure(dimensions,trend=True):
+    param = [ 'wind_kph','pressure_mb' ]
+    if trend:
+      param.append('pressure_trend']
+
+    for idx,val in enumerate(param):
+      param[idx] = str(self.weather.conditions(param[idx]))
+
+    param[0] += " km/h"
+    param[1] += " hpa"
+
+    if param[2]:
+      y = self.icoSize[1]
+    else:
+      y = 0
+
+    dimensions = (dimensions[0],(dimensions[1]-y)/len(param))
+
+    if trend:
+      if param[2] != '+' or param[2] != '-':
+        param[2] = "Pressure is stable"
+      elif param[2] == '+':
+        param[2] = "Pressure is rising"
+      else:
+        param[2] = "Pressure is falling"
+
+    for idx,val in enumerate(param):
+      if idx > 1:
+        dimensions = (dimensions[0],y)
+      tmp = Block(dimensions).text(val,\
+                                   horizontal = "right",\
+                                   vertical   = "down",\
+                                   fontSize   = 60)
+      try:
+        out.join(tmp,"down")
+      except AttributeError:
+        out = tmp
+
+    return out
+
+  def __conditions(dimensions):
+    return Block(dimensions).text(self.weather.conditions('weather'),\
+                                  vertical='up',\
+                                  fontSize=32)
+
+  def __forecast(dimensions):
+    while True:
+      if not self.weather.forecast(self.forecastDays-1,'conditions'):
+        forecastDays -= 1
+      else:
+        break
+
+    if forecastDays < 1:
+      return Block()
+
+    dimensions = (dimensions[0]/forecastDays,(dimensions[1]-self.iconSize[1])/3)
+
+    days = Block()
+    for day in range(0,forecastDays):
+      ico = self.__icon(self.weather.forecast(day,'icon_url'))
+      # TODO resize icon to self.iconSize
+      new = Block(dimensions)
+      new.text(self.weather.forecast(day,'date','weekday_short'), \
+               fontSize = 30, \
+               vertical = "up" )
+      new.join(ico,"down")
+      temperature = Block((dimensions[0],dimensions[1]*2))
+      temperature.text(str(self.weather.forecast(day,'high','celsius')) + "\n" \
+                       "\n" + \
+                       str(self.weather.forecast(day,'high','celsius')))
+      new.join(temperature,"down")
+      days.join(new)
+
+    return days
+
 
 def create(weather,size=(600,800),forecastDays=None):
-  
-# current weather icon:
-  if not weather.data:
-    path = './images/screen.png'
-    if os.path.isfile(path):
-      screen  = Block(path=path)
-      message = Block((screen.block.size[0],size[1]-screen.block.size[1]))
-      message.text("Cannot download new weather data",fontSize=16)
-      screen.join(message,"down")
-      screen.save(path)
-      return path
-    print "Cannot download new weather data"
-    return ""
 
+# current weather icon:
   screen = icon(weather.conditions('icon_url'))
   icoSize = screen.block.size
- 
+
   # wind and pressure:
   wind     = str(weather.conditions('wind_kph'))    + " km/h"
   pressure = str(weather.conditions('pressure_mb')) + " hpa"

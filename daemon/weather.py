@@ -71,7 +71,11 @@ class Weather:
                           }
       self.__save({'conditions' : formatedObservation})
     else:
-      return self.data["current_observation"][parameter]
+      try:
+        return self.data["current_observation"][parameter]
+      except KeyError:
+        print "Wrong paremeter: " + str(parameter)
+        return "---"
 
 
   def forecast(self,day,parameter=None,unit=None,save=False):
@@ -100,14 +104,15 @@ class Weather:
     try:
       forecast = forecast[parameter]
     except KeyError:
-      return "Wrong parameter: " + str(parameter)
+      print "Wrong parameter: " + str(parameter)
+      return "---"
 
     if unit:
       try:
         return forecast[unit]
       except KeyError:
         print ( "Wrong unit: " + str(unit) )
-        return None
+        return "--"
       except TypeError:
         return forecast
     else:

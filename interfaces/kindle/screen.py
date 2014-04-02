@@ -84,13 +84,7 @@ def create(weather,size=(600,800),forecastDays=None):
 
   screen.join(left,"left")
 
-
-
-#  feelTemp = Block((size[0]/2,size[1]/10))
-#  feelTemp.text("Feels like: " + str(weather.conditions()['feeltemp']) + "C",fontSize=12)
-
-#  temperature.join(feelTemp,"down")
-
+  # forecast
   days = Block()
   if not forecastDays:
     forecastDays = 4
@@ -117,7 +111,8 @@ def create(weather,size=(600,800),forecastDays=None):
   
     screen.join(days,"down","center")
 
-
+  # save
+  
   path = './images/screen.png'
   screen.expand(size)
   screen.save(path)

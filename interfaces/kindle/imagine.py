@@ -165,8 +165,8 @@ class Block():
 
 if __name__ == '__main__':
   img = Block((300,360),128)
-#  img2 = Block((200,200),0)
-  img.text("10 C ",fontSize=270)
-#  img2.text("Congratulations\nIt works!",horizontal="center")
-#  img.join(img2,"down")
+  img2 = Block((200,200),0)
+  img.text("!!!!!!!!",fontSize=270)
+  img2.text("Congratulations\nIt works!",horizontal="center")
+  img.join(img2,"down")
   img.show()

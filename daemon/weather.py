@@ -114,8 +114,6 @@ class Weather:
       return forecast
 
 
-
-
   def save(self,conditions=True,forecast=False):
     if self.tmpFile:
       if conditions:
@@ -124,9 +122,3 @@ class Weather:
         self.forecast(True)
     else:
       print ("No save file specified")
-
-if __name__ == '__main__':
-  from pprint import pprint
-  weather = Weather("PL/Krakow","fecfc874ac6ad136")
-#  pprint(weather.conditions(parameter='sky'))
-  pprint(weather.forecast(day=0,parameter='high',unit='celsius'))

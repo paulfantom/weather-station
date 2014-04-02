@@ -10,7 +10,7 @@
 # key can be obtained from:
 # http://www.wunderground.com/weather/api/d/pricing
 # if no APIkey specified then no weather data will be gathered
-APIkey = fecfc874ac6ad136
+APIkey = 
 # Weather station location from wunderground.com
 # if location if not specified then it will be found by IP
 location = PL/Krakow

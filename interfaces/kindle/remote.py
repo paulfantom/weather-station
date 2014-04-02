@@ -25,17 +25,18 @@ class RemoteDisplay:
     except Exception:
       print ( "Cannot connect do remote device" )
 
-  def send(self,where='/mnt/us/extensions/WeatherStation/bin/screen.png'):
+  def send(self,where='/tmp/screen.png'):
     try:
       sftp = self.ssh.open_sftp()
     except Exception:
       print ( "Display not updated" )
       return
     try:
+      print self.screen
       sftp.put(self.screen,where)
       command = '/usr/sbin/eips -g ' + where
     except OSError:
-      where = '/mnt/us/extensions/WeatherStation/bin/TARDIS.jpg'
+      print "No file to send"
       
     command = '/usr/sbin/eips -g ' + where
     (stdin, stdout, stderr) = self.ssh.exec_command(command)
@@ -56,7 +57,8 @@ class RemoteDisplay:
   def auto(self):
     self.connect()
     self.send()
-    self.close()
+    #self.close()
+    self.ssh.close()
 
 
 if __name__ == '__main__':

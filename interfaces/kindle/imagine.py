@@ -17,53 +17,21 @@ class Block():
 
   def __maxFont(self,text,path,fontSize,lines=1):
     border = (self.block.size[0],self.block.size[1] / lines)
-    if fontSize:
+    if not fontSize:
+      fontSize = border[1] * 72/96
+
+    font  = ImageFont.truetype(path,fontSize)
+    fsize = font.getsize(text)
+    if fsize[1] > border[1]:
+      fontSize = border[1] * 72 / 96
       font  = ImageFont.truetype(path,fontSize)
       fsize = font.getsize(text)
-      if fsize[0] < border[0] and fsize[1] < border[1]:
-        return { fsize : font }
-    
-    fontSize = border[1] * 72 / 96
-    font  = ImageFont.truetype(path,fontSize)
+
     if fsize[0] > border[0]:
       divider  = float(fsize[0])/float(border[0])
       fontSize = fontSize/divider
       font = ImageFont.truetype(path,int(fontSize))
       fsize = font.getsize(text)
-
-#    fontSize = 200
-#    border = (self.block.size[0],self.block.size[1] / lines)
-#    for dim in (1,0):
-#      step = 100
-#      i = 1
-#      while True:
-#        font = ImageFont.truetype(path,fontSize)
-#        height = font.getsize(text)[dim]
-#        if   height < border[dim] - 8:
-#          fontSize += step/i
-#        elif height >= border[dim]:
-#          fontSize -= step/i
-#        else:
-#          break
-#        i +=1
-#        if i > 26:
-#          break
-#        if dim == 0:
-#          print fontSize,height
-
-#####
-#    if not fontSize:
-#      fontSize = 4
-
-#    while font.getsize(text)[1] < (self.block.size[1] / lines):
-#      font = ImageFont.truetype(path,fontSize)
-#      fontSize += 2
-#
-#    font = ImageFont.truetype(path,fontSize-6)
-
-#    while font.getsize(text)[0] > self.block.size[0]:
-#      fontSize -= 2
-#      font = ImageFont.truetype(path,fontSize)
 
     return { fsize : font }
 
@@ -166,6 +134,15 @@ class Block():
     new.paste(another.block,coordinatesAnother)
 
     self.block = new
+
+  def expand(self,(x,y)):
+    if x > self.block.size[0]:
+      new = Block((x-self.block.size[0],self.block.size[1]))
+      self.join(new)
+    if y > self.block.size[1]:
+      new = Block((self.block.size[0],y-self.block.size[1]))
+      self.join(new,"down")
+
   
   def grayscale(self,background=None):
     self.block = self.block.convert('L')
@@ -179,6 +156,10 @@ class Block():
     self.block.show()
 
   def save(self,path):
+    if path[-4] == '.':
+      path = path[:-4]
+    elif path[-5] == '.':
+      path = path[:-5]
     path += ".png"
     self.block.save(path,"png")
 

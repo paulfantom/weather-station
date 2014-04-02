@@ -15,48 +15,76 @@ import os
 
 def time(screenSize=(600,800)):
   hour = Block((screenSize[0]/2,screenSize[1]/20))
-  hour.text(strftime("%H:%m"),fontSize=16)
+  hour.text(strftime("%H:%M"),fontSize=16,vertical="down")
+  hour.show()
   return hour
 
 def icon(url):
   splitted = url.split("/")
   name = splitted[-1]
   try:
-    icon = Block(path="./icons/" + name.split(".")[0] + ".png")
+    path = "./images/" + name.split(".")[0] + ".png"
+    icon = Block(path="./images/" + name.split(".")[0] + ".png")
   except IOError:
     splitted[-2] = "j"
     url = "/".join(splitted)
-    f = open("./icons/" + name,'wb')
+    f = open("./images/" + name,'wb')
     f.write(urlopen(url).read())
     f.close()
-    icon = Block(path="./icons/" + name)
+    name = "./images/" + name
+    icon = Block(path=name)
     icon.grayscale(0)
-    icon.save("./icons/" + name.split(".")[0])
-    os.remove("./icons/" + name)
+    os.remove(name)
 
   return icon
 
-def create(weather,size=(600,800)):
-#  screen  = icon(weather.conditions()['sky_icon'])
-#  icoSize = screen.block.size
-#  screen.join(time(),"left")
-  screen = time()
+def create(weather,size=(600,800),forecastDays=None):
   
-#  ico = icon(weather.conditions()['sky_icon'])
-#  icoSize = ico.block.size
-  icoSize = (50,50)
-#  screen.join(ico,"down")
+# current weather icon:
+  if not weather.data:
+    path = './images/screen.png'
+    if os.path.isfile(path):
+      screen  = Block(path=path)
+      message = Block((screen.block.size[0],size[1]-screen.block.size[1]))
+      message.text("Cannot download new weather data",fontSize=16)
+      screen.join(message,"down")
+      screen.save(path)
+      return path
+    print "Cannot download new weather data"
+    return ""
 
-  temperature = Block((size[0]/2,size[1]/2 - size[1]/20 - icoSize[1]))
-  value = str(weather.conditions()['temp']) + "C"
-  temperature.text(value)
+  screen = icon(weather.conditions('icon_url'))
+  icoSize = screen.block.size
+ 
+  # wind and pressure:
+  wind     = str(weather.conditions('wind_kph'))    + " km/h"
+  pressure = str(weather.conditions('pressure_mb')) + " hpa"
+  trend    = str(weather.conditions('pressure_trend'))
+  if trend != '+' or trend != '-':
+    trend = "Pressure is stable"
+  elif trend == '+':
+    trend = "Pressure is rising"
+  else:
+    trend = "Pressure is falling"
 
-  screen.join(temperature,"down")
+  for i in (wind,pressure):
+    tmp = Block((size[0]/2,size[1]/8-icoSize[1]/2))
+    tmp.text(i,horizontal="right",vertical="down",fontSize=60)
+    screen.join(tmp,"down","center")
 
-  wind = Block((size[0]/2,size[1]/4 - size[1]/10 - size[1]/20))
-  wind.text(str(weather.conditions()['wind_kph']) + " km/h")
+  tmp = Block((size[0]/2,icoSize[1]))
+  tmp.text(trend,fontSize=16,vertical="up")
+  screen.join(tmp,"down")
 
-  screen.join(wind,"down")
+  # time and temperature:
+  left = time()
+  temperature = Block((size[0]/2,screen.block.size[1] - left.block.size[1]))
+  temperature.text(str(weather.conditions('temp_c')) + " C ",horizontal = "left")
+  left.join(temperature,"down","center")
+
+  screen.join(left,"left")
+
+
 
 #  feelTemp = Block((size[0]/2,size[1]/10))
 #  feelTemp.text("Feels like: " + str(weather.conditions()['feeltemp']) + "C",fontSize=12)
@@ -64,49 +92,34 @@ def create(weather,size=(600,800)):
 #  temperature.join(feelTemp,"down")
 
   days = Block()
-  for name in ('today','tomorrow','dayafter'):
-    newIco = icon(weather.forecast()[name]['sky_icon'])
-    new = Block((size[0]/6,icoSize[1]))
-    new.text(" " + weather.forecast()[name]['weekday'] + " ")
-    new.join(newIco,"down")
-    temp = Block((new.block.size[0],size[1]/8))
-    temp.text(weather.forecast()[name]['temp_high'] + \
+  if not forecastDays:
+    forecastDays = 4
+  while True:
+    if not weather.forecast(forecastDays-1,'conditions'):
+      forecastDays -=1
+    else:
+      break
+
+  if forecastDays > 0:
+    for day in range(0,forecastDays):
+      newIco = icon(weather.forecast(day,'icon_url'))
+      new = Block((size[0]/forecastDays,icoSize[1]))
+      new.text(weather.forecast(day,'date','weekday_short'),\
+               fontSize=30,\
+               vertical="up")
+      new.join(newIco,"down")
+      temp = Block((new.block.size[0],size[1]/8))
+      temp.text(str(weather.forecast(day,'high','celsius')) + "\n" + \
               "\n" + \
-              "\n" + \
-              weather.forecast()[name]['temp_low'])
-    new.join(temp,"down")
-    try:
+              str(weather.forecast(day,'low','celsius')))
+      new.join(temp,"down")
       days.join(new)
-    except UnboundLocalError:
-      pass
+  
+    screen.join(days,"down","center")
 
-  screen.join(days)
 
-  pressure = Block((size[0]*3/4,size[1]/8))
-  pressure.text(weather.conditions()['pressure'] + " hpa",horizontal='left')
-  trend    = Block((size[0] - pressure.block.size[0],size[1]/8))
-  trend.text(   weather.conditions()['presTrend'])
-  pressure.join(trend,'right')
-
-  screen.join(pressure,'down')
-
-  conditions = Block((size[0],size[1]-screen.block.size[1]))
-  conditions.text(weather.conditions()['sky'],vertical='up',fontSize=20)
-
-  screen.join(conditions,'down')
-  path = '/tmp/screen'
+  path = './images/screen.png'
+  screen.expand(size)
   screen.save(path)
-  return path + ".png"
-
-
-
-if __name__ == '__main__':
-
-  from weather  import Weather
-  from pprint import pprint
-
-  location = 'PL/Krakow'
-  API_KEY="fecfc874ac6ad136"
-  weather = Weather(location,API_KEY)
-  create(weather)
+  return path
 

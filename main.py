@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from daemon.config  import Configuration
 from daemon.weather import Weather
+#from daemon.weather_test import Weather
 import sys
 
 

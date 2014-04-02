@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from PIL import Image,ImageDraw,ImageFont,ImageOps
+import sys
 
 class Block():
   def __init__(self,size=(0,0),background=255,path=None):
@@ -15,21 +16,24 @@ class Block():
 #    self.area  = ImageDraw.Draw(self.block)
 
   def __maxFont(self,text,path,fontSize,lines=1):
+    border = (self.block.size[0],self.block.size[1] / lines)
     if not fontSize:
-      fontSize = 4
+      fontSize = border[1] * 72/96
 
-    font = ImageFont.truetype(path,fontSize)
-    while font.getsize(text)[1] < (self.block.size[1] / lines):
-      font = ImageFont.truetype(path,fontSize)
-      fontSize += 2
+    font  = ImageFont.truetype(path,fontSize)
+    fsize = font.getsize(text)
+    if fsize[1] > border[1]:
+      fontSize = border[1] * 72 / 96
+      font  = ImageFont.truetype(path,fontSize)
+      fsize = font.getsize(text)
 
-    font = ImageFont.truetype(path,fontSize-6)
+    if fsize[0] > border[0]:
+      divider  = float(fsize[0])/float(border[0])
+      fontSize = fontSize/divider
+      font = ImageFont.truetype(path,int(fontSize))
+      fsize = font.getsize(text)
 
-    while font.getsize(text)[0] > self.block.size[0]:
-      fontSize -= 2
-      font = ImageFont.truetype(path,fontSize)
-
-    return { font.getsize(text) : font }
+    return { fsize : font }
 
   def __margin(self,first,second,axis='x',justify="center"):
     if axis == 'x':
@@ -130,6 +134,15 @@ class Block():
     new.paste(another.block,coordinatesAnother)
 
     self.block = new
+
+  def expand(self,(x,y)):
+    if x > self.block.size[0]:
+      new = Block((x-self.block.size[0],self.block.size[1]))
+      self.join(new)
+    if y > self.block.size[1]:
+      new = Block((self.block.size[0],y-self.block.size[1]))
+      self.join(new,"down")
+
   
   def grayscale(self,background=None):
     self.block = self.block.convert('L')
@@ -143,13 +156,17 @@ class Block():
     self.block.show()
 
   def save(self,path):
+    if path[-4] == '.':
+      path = path[:-4]
+    elif path[-5] == '.':
+      path = path[:-5]
     path += ".png"
     self.block.save(path,"png")
 
 if __name__ == '__main__':
-  img = Block((300,200),128)
+  img = Block((300,360),128)
   img2 = Block((200,200),0)
-  img.text("Success")
+  img.text("!!!!!!!!",fontSize=270)
   img2.text("Congratulations\nIt works!",horizontal="center")
   img.join(img2,"down")
   img.show()

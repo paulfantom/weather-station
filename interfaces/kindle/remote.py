@@ -34,12 +34,9 @@ class RemoteDisplay:
     try:
       sftp.put(self.screen,where)
       command = '/usr/sbin/eips -g ' + where
+      (stdin, stdout, stderr) = self.ssh.exec_command(command)
     except OSError:
-      print "No file to send"
-      
-    command = '/usr/sbin/eips -g ' + where
-    (stdin, stdout, stderr) = self.ssh.exec_command(command)
-
+      print "Cannot update screen"
 
   def quit(self):
     command = '/usr/sbin/eips -g /mnt/us/extensions/WeatherStation/bin/TARDIS.jpg'

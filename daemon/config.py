@@ -81,7 +81,8 @@ class Configuration():
 
   def getFont(self):
     try:
-      return self.config.get('screen','font')
+      font = self.config.get('screen','font')
+      return str(font)
     except ConfigParser.NoOptionError:
       return "/usr/share/fonts/dejavu/DejaVuSans.ttf"
     except Exception:

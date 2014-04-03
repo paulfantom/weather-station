@@ -28,7 +28,8 @@ class Screen():
         message.text("Cannot download new weather data\n" + \
                      "\n" + \
                      "Check internet connection", \
-                     fontSize=16)
+                     fontSize=20,\
+                     font=self.font)
         image.join(message,"down")
       except IOError:
         print "Cannot download weather data"

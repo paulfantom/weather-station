@@ -123,7 +123,7 @@ class Screen():
     for idx,val in enumerate(param):
       if idx > 1:
         dimensions = (dimensions[0],y)
-        fontSize /= 1
+        fontSize = 16
         justify  = "center"
       tmp = Block(dimensions).text(val,\
                                    horizontal = justify,\

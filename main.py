@@ -20,7 +20,8 @@ if __name__ == '__main__':
     from interfaces.kindle.remote import RemoteDisplay
     import interfaces.kindle.screen as screen
     path = screen.create(weather)
-    kindle = RemoteDisplay(path)
-    kindle.auto()
+    print path
+    #kindle = RemoteDisplay(path)
+    #kindle.auto()
   if interfaces.find("web") != -1:
     pass

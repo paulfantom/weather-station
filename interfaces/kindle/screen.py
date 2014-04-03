@@ -7,20 +7,24 @@ from urllib  import urlopen
 import os
 
 class Screen():
-  def __init__(self,weather,\
-               size=(600,800),\
-               forecastDays=4,\
-               path='./images/screen.png'):
+  def __init__(self,\
+               weather,\
+               size         = (600,800),\
+               forecastDays = 4,\
+               path         = './images/screen.png',\
+               font         = "/usr/share/fonts/dejavu/DejaVuSans.ttf",\
+               iconSize     = (50,50)):
 
     self.path         = path
-    self.iconSize     = (50,50)
+    self.iconSize     = iconSize 
+    self.font         = font
     self.forecastDays = forecastDays
     self.weather      = weather
     if not weather.data:
       try:
-        image = Block(path=path)
+        image     = Block(path=path)
         self.size = image.size
-        message = Block((image.size[0],size[1]-image.size[1]))
+        message   = Block((image.size[0],image.size[1]*3/8 - iconSize[1]))
         message.text("Cannot download new weather data\n" + \
                      "\n" + \
                      "Check internet connection", \
@@ -28,7 +32,6 @@ class Screen():
         image.join(message,"down")
       except IOError:
         print "Cannot download weather data"
-        print "No screen.png file to upload"
     else:
       self.size = size
       right  = self.__icon(weather.conditions('icon_url'))
@@ -37,19 +40,18 @@ class Screen():
       image.join(self.__temperature((size[0]/2,size[1]/4)),"down")
       right.join(self.__windAndPressure((size[0]/2,size[1]/4)),"down")
       image.join(right,"right")
-      image.join(self.__conditions((size[0],size[1]/10)),"down")
+      image.join(self.__conditions((size[0],size[1]/8)),"down")
       image.join(self.__forecast((size[0],size[1]/4)),"down")
-      image.show()
     image.save(path)
     self.path = path
 
 
   def __time(self,dimensions):
-#    hour = Block((screenSize[0]/2,screenSize[1]/20))
     hour = strftime("%H:%M")
     return Block(dimensions).text(hour,\
-                                  fontSize=16,\
-                                  vertical="center")
+                                  fontSize = 16,\
+                                  vertical = "center",
+                                  fontPath = self.font)
 
   def __icon(self,url):
     splitted = url.split("/")
@@ -66,9 +68,10 @@ class Screen():
       path= "./images/" + name
       icon = Block(path=path)
       icon.grayscale(0)
+      if icon.size[0] != self.iconSize[0] or icon.size[1] != self.iconSize[1]:
+        icon.resize(self.iconSize)
       os.remove(path)
 
-    self.iconSize = icon.block.size
     icon.save(path)
     return icon
 
@@ -80,10 +83,13 @@ class Screen():
         dimensions = (dimensions[0],dimensions[1]-self.iconSize[1])
 
         feels = Block((dimensions[0],self.iconSize[1]))
-        feels.text("It feels like " + feelTemp + " C",fontSize=16)
+        feels.text("It feels like " + feelTemp + " C",\
+                   fontSize = 16,\
+                   fontPath = self.font)
 
     temperature = Block(dimensions).text(str(currentTemp) + " C", \
-                                         horizontal = "left")
+                                         horizontal = "left",
+                                         fontPath = self.font)
     try:
       temperature.join(feels,"down")
     except UnboundLocalError:
@@ -128,7 +134,8 @@ class Screen():
       tmp = Block(dimensions).text(val,\
                                    horizontal = justify,\
                                    vertical   = "down",\
-                                   fontSize   = fontSize)
+                                   fontSize   = fontSize,\
+                                   fontPath   = self.font)
       try:
         out.join(tmp,"down")
       except UnboundLocalError:
@@ -138,8 +145,9 @@ class Screen():
 
   def __conditions(self,dimensions):
     return Block(dimensions).text(self.weather.conditions('weather'),\
-                                  vertical='up',\
-                                  fontSize=32)
+                                  vertical = 'up',\
+                                  fontSize = 32,\
+                                  fontPath = self.font)
 
   def __forecast(self,dimensions):
     while True:
@@ -160,12 +168,14 @@ class Screen():
       new = Block(dimensions)
       new.text(self.weather.forecast(day,'date','weekday_short'), \
                fontSize = 30, \
-               vertical = "up" )
+               vertical = "up",\
+               fontPath = self.font )
       new.join(ico,"down")
       temperature = Block((dimensions[0],dimensions[1]*2))
       temperature.text(str(self.weather.forecast(day,'high','celsius')) + "\n" \
                        "\n" + \
-                       str(self.weather.forecast(day,'high','celsius')))
+                       str(self.weather.forecast(day,'high','celsius')),\
+                       fontPath = self.font)
       new.join(temperature,"down")
       days.join(new)
 

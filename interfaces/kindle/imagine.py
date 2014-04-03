@@ -145,7 +145,6 @@ class Block():
       new = Block((self.block.size[0],y-self.block.size[1]))
       self.join(new,"down")
 
-  
   def grayscale(self,background=None):
     self.block = self.block.convert('L')
     if not background:

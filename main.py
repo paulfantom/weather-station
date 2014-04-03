@@ -16,12 +16,11 @@ if __name__ == '__main__':
     print "Wrong delimeter in config file: [screen] type. Should be ','"
     sys.exit(1)
 
-  if   interfaces.find("kindle") != -1:
+  if interfaces.find("kindle") != -1:
     from interfaces.kindle.remote import RemoteDisplay
-    import interfaces.kindle.screen as screen
-    path = screen.create(weather)
-    print path
-    #kindle = RemoteDisplay(path)
-    #kindle.auto()
+    from interfaces.kindle.screen import Screen
+    path = Screen(weather)
+    kindle = RemoteDisplay(path)
+    kindle.auto()
   if interfaces.find("web") != -1:
     pass

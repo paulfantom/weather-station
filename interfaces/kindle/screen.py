@@ -98,7 +98,6 @@ class Screen():
     return temperature
 
   def __windAndPressure(self,dimensions,trend=True):
-    print dimensions
     param = [ 'wind_kph','pressure_mb' ]
     if trend:
       param.append('pressure_trend')

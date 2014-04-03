@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from daemon.config  import Configuration
-from daemon.weather import Weather
-import daemon.signals as signals
+from   core.config  import Configuration
+from   core.weather import Weather
+import core.signals as signals
 import sys
 
 

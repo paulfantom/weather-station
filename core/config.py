@@ -71,11 +71,24 @@ class Configuration():
     try:
       dimensions['x'] = self.config.get('screen','x')
       dimensions['y'] = self.config.get('screen','y')
+    except ConfigParser.NoOptionError:
+      dimensions = (600,800)
     except Exception:
       print "Error parsing config file: [screen] x y"
       print "Terminating"
       sys.exit(1)
     return dimensions
+
+  def getFont(self):
+    try:
+      font = self.config.get('screen','font')
+      return str(font)
+    except ConfigParser.NoOptionError:
+      return "/usr/share/fonts/dejavu/DejaVuSans.ttf"
+    except Exception:
+      print "Error parsing config file: [screen] font"
+      print "Terminating"
+      sys.exit(1)
 
   def getType(self):
     try:

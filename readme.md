@@ -2,7 +2,6 @@ needed packages:
   python imaging library (PIL)
   paramiko (for ssh only)
 
-instructions for Linux Mint:
 paramiko can be downloaded from:
 	http://www.lag.net/paramiko/legacy.html
 	

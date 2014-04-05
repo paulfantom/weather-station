@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from PIL import Image,ImageDraw,ImageFont,ImageOps
 import sys
 
@@ -13,7 +14,8 @@ class Block():
       self.block = Image.open(path)
     else:
       self.block = Image.new("L",size,background)
-#    self.area  = ImageDraw.Draw(self.block)
+
+    self.size = self.block.size
 
   def __maxFont(self,text,path,fontSize,lines=1):
     border = (self.block.size[0],self.block.size[1] / lines)
@@ -33,6 +35,7 @@ class Block():
       font = ImageFont.truetype(path,int(fontSize))
       fsize = font.getsize(text)
 
+    self.fontSize = fsize
     return { fsize : font }
 
   def __margin(self,first,second,axis='x',justify="center"):
@@ -95,6 +98,7 @@ class Block():
 
     for idx,line in enumerate(value):
       x = self.__margin(textSize[idx],self.block.size,'x',horizontal)
+    #  uLine = unicode(line,'utf-8')
       area.text((x,y),line,fill=colour,font=font)
       y += h
 
@@ -143,7 +147,15 @@ class Block():
       new = Block((self.block.size[0],y-self.block.size[1]))
       self.join(new,"down")
 
-  
+  def resize(self,dimensions):
+    if self.size[0] > dimensions[0] and self.size[1] > dimensions[1]:
+      self.block.thumbnail(dimensions,Image.ANTIALIAS)
+    else:
+      self.block = self.block.resize(dimensions,Image.ANTIALIAS)
+
+    self.size = self.block.size
+    return self.block
+
   def grayscale(self,background=None):
     self.block = self.block.convert('L')
     if not background:
@@ -169,4 +181,3 @@ if __name__ == '__main__':
   img.text("!!!!!!!!",fontSize=270)
   img2.text("Congratulations\nIt works!",horizontal="center")
   img.join(img2,"down")
-  img.show()

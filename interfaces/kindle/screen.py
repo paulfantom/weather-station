@@ -6,132 +6,180 @@ from time    import strftime
 from urllib  import urlopen
 import os
 
-#def __init__(self,size=(600,800),background=128):
-#  self.background = background
-#  self.block      = Block(background=background)
-#  self.iconSize   = (50,50)
-#  self.x          = size[0]
-#  self.y          = size[1]
+class Screen():
+  def __init__(self,\
+               weather,\
+               size         = (600,800),\
+               forecastDays = 4,\
+               path         = './images/screen.png',\
+               font         = "/usr/share/fonts/dejavu/DejaVuSans.ttf",\
+               iconSize     = (50,50)):
 
-def time(screenSize=(600,800)):
-  hour = Block((screenSize[0]/2,screenSize[1]/20))
-  hour.text(strftime("%H:%M"),fontSize=16,vertical="center")
-  return hour
-
-def icon(url):
-  splitted = url.split("/")
-  name = splitted[-1]
-  try:
-    path = "./images/" + name.split(".")[0] + ".png"
-    icon = Block(path="./images/" + name.split(".")[0] + ".png")
-  except IOError:
-    splitted[-2] = "j"
-    url = "/".join(splitted)
-    f = open("./images/" + name,'wb')
-    f.write(urlopen(url).read())
-    f.close()
-    name = "./images/" + name
-    icon = Block(path=name)
-    icon.grayscale(0)
-    os.remove(name)
-
-  return icon
-
-def create(weather,size=(600,800),forecastDays=None):
-  
-# current weather icon:
-  if not weather.data:
-    path = './images/screen.png'
-    if os.path.isfile(path):
-      screen  = Block(path=path)
-      message = Block((screen.block.size[0],size[1]-screen.block.size[1]))
-      message.text("Cannot download new weather data",fontSize=16)
-      screen.join(message,"down")
-      screen.save(path)
-      return path
-    print "Cannot download new weather data"
-    return ""
-
-  screen = icon(weather.conditions('icon_url'))
-  icoSize = screen.block.size
- 
-  # wind and pressure:
-  wind     = str(weather.conditions('wind_kph'))    + " km/h"
-  pressure = str(weather.conditions('pressure_mb')) + " hpa"
-  trend    = str(weather.conditions('pressure_trend'))
-  if trend != '+' or trend != '-':
-    trend = "Pressure is stable"
-  elif trend == '+':
-    trend = "Pressure is rising"
-  else:
-    trend = "Pressure is falling"
-
-  for i in (wind,pressure):
-    tmp = Block((size[0]/2,size[1]/8-icoSize[1]/2))
-    tmp.text(i,horizontal="right",vertical="down",fontSize=60)
-    screen.join(tmp,"down")
-
-  tmp = Block((size[0]/2,icoSize[1]))
-  tmp.text(trend,fontSize=16,vertical="up")
-  screen.join(tmp,"down")
-
-  # time and temperature:
-  left = time()
-  curTemp  = weather.conditions('temp_c')
-  feelTemp = weather.conditions('feelslike_c')
-  if feelTemp == curTemp:
-    y = screen.block.size[1] - left.block.size[1]
-  else:
-    y = screen.block.size[1] - left.block.size[1]*2
-    feels = Block((size[0]/2,tmp.block.size[1]))
-    feels.text("It feels like " + feelTemp + " C",fontSize=16)
-
-  temperature = Block((size[0]/2,y))
-  temperature.text(str(curTemp) + " C ",horizontal = "left")
-  left.join(temperature,"down","center")
-
-  if feelTemp == curTemp:
-    left.join(feels,"down","down")
-
-  screen.join(left,"left")
-
-  # conditions
-
-  conditions = Block((size[0],size[1]/10))
-  conditions.text(weather.conditions('weather'),vertical='up',fontSize=32)
-  screen.join(conditions,"down")
-
-  # forecast
-  days = Block()
-  if not forecastDays:
-    forecastDays = 4
-  while True:
-    if not weather.forecast(forecastDays-1,'conditions'):
-      forecastDays -=1
+    self.path         = path
+    self.iconSize     = iconSize 
+    self.font         = font
+    self.forecastDays = forecastDays
+    self.weather      = weather
+    if weather.data == None:
+      try:
+        image   = Block(path=path)
+      except IOError:
+        image   = Block(size)
+      message   = Block((image.size[0],image.size[1]*3/8 - iconSize[1]))
+      message.text("Cannot download new weather data\n" + \
+                   "\n" + \
+                   "Check internet connection", \
+                   fontSize = 20,\
+                   fontPath = self.font)
+      if image.size[1] >= size[1]:
+        coords = (size[0]-message.size[0],size[1]-message.size[1])
+        image.block.paste(message.block,coords)
+      else:
+        image.join(message,"down")
     else:
-      break
+      right  = self.__icon(weather.conditions('icon_url'))
+      self.icoSize = right.size
+      image = self.__time((size[0]/2,right.size[1]))
+      image.join(self.__temperature((size[0]/2,size[1]/4)),"down")
+      right.join(self.__windAndPressure((size[0]/2,size[1]/4)),"down")
+      image.join(right,"right")
+      image.join(self.__conditions((size[0],size[1]/8)),"down")
+      image.join(self.__forecast((size[0],size[1]/4)),"down")
+      image.expand(size)
+    image.save(path)
+    self.path = path
 
-  if forecastDays > 0:
-    for day in range(0,forecastDays):
-      newIco = icon(weather.forecast(day,'icon_url'))
-      new = Block((size[0]/forecastDays,icoSize[1]))
-      new.text(weather.forecast(day,'date','weekday_short'),\
-               fontSize=30,\
-               vertical="up")
-      new.join(newIco,"down")
-      temp = Block((new.block.size[0],size[1]/8))
-      temp.text(str(weather.forecast(day,'high','celsius')) + "\n" + \
-              "\n" + \
-              str(weather.forecast(day,'low','celsius')))
-      new.join(temp,"down")
+
+  def __time(self,dimensions):
+    hour = strftime("%H:%M")
+    return Block(dimensions).text(hour,\
+                                  fontSize = 16,\
+                                  vertical = "center",
+                                  fontPath = self.font)
+
+  def __icon(self,url):
+    splitted = url.split("/")
+    name = splitted[-1]
+    try:
+      path = "./images/" + name.split(".")[0] + ".png"
+      icon = Block(path=path)
+    except IOError:
+      splitted[-2] = "j"
+      url = "/".join(splitted)
+      f = open("./images/" + name,'wb')
+      f.write(urlopen(url).read())
+      f.close()
+      path= "./images/" + name
+      icon = Block(path=path)
+      icon.grayscale(0)
+      if icon.size[0] != self.iconSize[0] or icon.size[1] != self.iconSize[1]:
+        icon.resize(self.iconSize)
+      os.remove(path)
+
+    icon.save(path)
+    return icon
+
+  def __temperature(self,dimensions,feel=True):
+    currentTemp = self.weather.conditions('temp_c')
+    if feel:
+      feelTemp = self.weather.conditions('feelslike_c')
+      if int(feelTemp) != int(currentTemp):
+        dimensions = (dimensions[0],dimensions[1]-self.iconSize[1])
+
+        feels = Block((dimensions[0],self.iconSize[1]))
+        feels.text("It feels like " + feelTemp + unicode("°","utf-8"),\
+                   fontSize = 16,\
+                   fontPath = self.font)
+
+    temperature = Block(dimensions).text(str(currentTemp) + unicode("°","utf-8"), \
+                                         horizontal = "left",
+                                         fontPath = self.font)
+    try:
+      temperature.join(feels,"down")
+    except UnboundLocalError:
+      pass
+
+    return temperature
+
+  def __windAndPressure(self,dimensions,trend=True):
+    param = [ 'wind_kph','pressure_mb' ]
+    if trend:
+      param.append('pressure_trend')
+
+    for idx,val in enumerate(param):
+      param[idx] = str(self.weather.conditions(param[idx]))
+
+    param[0] += " km/h"
+    param[1] += " hpa"
+
+    if param[2]:
+      y = self.icoSize[1]/2
+    else:
+      y = 0
+    
+    dimensions = (dimensions[0],(dimensions[1]-y)/2)
+
+    if trend:
+      if param[2] != '+' or param[2] != '-':
+        param[2] = "Pressure is stable"
+      elif param[2] == '+':
+        param[2] = "Pressure is rising"
+      else:
+        param[2] = "Pressure is falling"
+
+    fontSize = 60
+    justify  = "right"
+    for idx,val in enumerate(param):
+      if idx > 1:
+        dimensions = (dimensions[0],y)
+        fontSize = 16
+        justify  = "center"
+      tmp = Block(dimensions).text(val,\
+                                   horizontal = justify,\
+                                   vertical   = "down",\
+                                   fontSize   = fontSize,\
+                                   fontPath   = self.font)
+      try:
+        out.join(tmp,"down")
+      except UnboundLocalError:
+        out = tmp
+
+    return out
+
+  def __conditions(self,dimensions):
+    return Block(dimensions).text(self.weather.conditions('weather'),\
+                                  vertical = 'up',\
+                                  fontSize = 32,\
+                                  fontPath = self.font)
+
+  def __forecast(self,dimensions):
+    while True:
+      if not self.weather.forecast(self.forecastDays-1,'conditions'):
+        self.forecastDays -= 1
+      else:
+        break
+
+    if self.forecastDays < 1:
+      return Block()
+
+    dimensions = (dimensions[0]/self.forecastDays,(dimensions[1]-self.iconSize[1])/3)
+
+    days = Block()
+    for day in range(0,self.forecastDays):
+      ico = self.__icon(self.weather.forecast(day,'icon_url'))
+      # TODO resize icon to self.iconSize
+      new = Block(dimensions)
+      new.text(self.weather.forecast(day,'date','weekday_short'), \
+               fontSize = 30, \
+               vertical = "up",\
+               fontPath = self.font )
+      new.join(ico,"down")
+      temperature = Block((dimensions[0],dimensions[1]*2))
+      temperature.text(str(self.weather.forecast(day,'high','celsius'))+unicode("°","utf-8") + "\n" \
+                       "\n" + \
+                       str(self.weather.forecast(day,'low','celsius'))+unicode("°","utf-8"),\
+                       fontPath = self.font)
+      new.join(temperature,"down")
       days.join(new)
-  
-    screen.join(days,"down","center")
 
-  # save
-  
-  path = './images/screen.png'
-  screen.expand(size)
-  screen.save(path)
-  return path
-
+    return days

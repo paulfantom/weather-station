@@ -30,8 +30,14 @@ class Weather:
                                              + location
                                              + ".json").read()
       self.data = json.loads(wundergroundResponse)
+      if "error" in self.data["response"]:
+        print ( "Weather server Message: " +\
+                str(self.data["response"]["error"]["description"]) )
+#        raise AttributeError
+        self.data = None
     except Exception:
       self.data = None
+      print "No weather data available"
 
   def __save(self,data):
     try:

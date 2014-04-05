@@ -44,6 +44,9 @@ location = PL/Krakow
 # height (default: 55)
 #y = 55
 #
+# path to truetype font (default: /usr/share/fonts/dejavu/DejaVuSans.ttf)
+font = /usr/share/fonts/dejavu/DejaVuSerif-BoldItalic.ttf
+#
 # ssh user (default: 'root')
 #user = root
 #

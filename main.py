@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-from daemon.config  import Configuration
-from daemon.weather import Weather
-#from daemon.weather_test import Weather
+from   core.config  import Configuration
+from   core.weather import Weather
+import core.signals as signals
 import sys
 
 
 if __name__ == '__main__':
-  from pprint import pprint
+
+  signals.setHandler()
 
   config = Configuration(path='./config')
   weather = Weather(config.getLocation(),config.getKey(),False)
@@ -16,11 +17,13 @@ if __name__ == '__main__':
     print "Wrong delimeter in config file: [screen] type. Should be ','"
     sys.exit(1)
 
-  if   interfaces.find("kindle") != -1:
+  if interfaces.find("kindle") != -1:
     from interfaces.kindle.remote import RemoteDisplay
-    import interfaces.kindle.screen as screen
-    path = screen.create(weather)
-    kindle = RemoteDisplay(path)
+    from interfaces.kindle.screen import Screen
+    dimensions = config.getDimensions()
+    font   = config.getFont()
+    screen = Screen(weather,dimensions,font=font)
+    kindle = RemoteDisplay(screen.path)
     kindle.auto()
   if interfaces.find("web") != -1:
     pass

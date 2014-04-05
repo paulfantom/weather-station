@@ -87,11 +87,11 @@ class Screen():
         dimensions = (dimensions[0],dimensions[1]-self.iconSize[1])
 
         feels = Block((dimensions[0],self.iconSize[1]))
-        feels.text("It feels like " + feelTemp + " C",\
+        feels.text("It feels like " + feelTemp + "°",\
                    fontSize = 16,\
                    fontPath = self.font)
 
-    temperature = Block(dimensions).text(str(currentTemp) + " C", \
+    temperature = Block(dimensions).text(str(currentTemp) + "°", \
                                          horizontal = "left",
                                          fontPath = self.font)
     try:
@@ -175,9 +175,9 @@ class Screen():
                fontPath = self.font )
       new.join(ico,"down")
       temperature = Block((dimensions[0],dimensions[1]*2))
-      temperature.text(str(self.weather.forecast(day,'high','celsius')) + "\n" \
+      temperature.text(str(self.weather.forecast(day,'high','celsius')+"°") + "\n" \
                        "\n" + \
-                       str(self.weather.forecast(day,'high','celsius')),\
+                       str(self.weather.forecast(day,'low','celsius')+"°"),\
                        fontPath = self.font)
       new.join(temperature,"down")
       days.join(new)

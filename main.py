@@ -22,7 +22,6 @@ if __name__ == '__main__':
     from interfaces.kindle.screen import Screen
     dimensions = config.getDimensions()
     font = config.getFont()
-    print font
     path = Screen(weather,dimensions,font=font)
 #    kindle = RemoteDisplay(path)
 #    kindle.auto()

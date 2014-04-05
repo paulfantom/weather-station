@@ -97,7 +97,7 @@ class Block():
 
     for idx,line in enumerate(value):
       x = self.__margin(textSize[idx],self.block.size,'x',horizontal)
-      area.text((x,y),line,fill=colour,font=font)
+      area.text((x,y),unicode(line,'utf-8'),fill=colour,font=font)
       y += h
 
     return self

@@ -30,8 +30,13 @@ class Weather:
                                              + location
                                              + ".json").read()
       self.data = json.loads(wundergroundResponse)
+      if self.data["response"]["error"]:
+        print ( "Wrong API key" )
+#        raise AttributeError
+        self.data = None
     except Exception:
       self.data = None
+      print "No weather data available"
 
   def __save(self,data):
     try:

@@ -20,21 +20,23 @@ class Screen():
     self.font         = font
     self.forecastDays = forecastDays
     self.weather      = weather
-    if not weather.data:
+    if weather.data == None:
       try:
-        image     = Block(path=path)
-        self.size = image.size
-        message   = Block((image.size[0],image.size[1]*3/8 - iconSize[1]))
-        message.text("Cannot download new weather data\n" + \
-                     "\n" + \
-                     "Check internet connection", \
-                     fontSize=20,\
-                     font=self.font)
-        image.join(message,"down")
+        image   = Block(path=path)
       except IOError:
-        print "Cannot download weather data"
+        image   = Block(size)
+      message   = Block((image.size[0],image.size[1]*3/8 - iconSize[1]))
+      message.text("Cannot download new weather data\n" + \
+                   "\n" + \
+                   "Check internet connection", \
+                   fontSize = 20,\
+                   fontPath = self.font)
+      if image.size[1] >= size[1]:
+        coords = (size[0]-message.size[0],size[1]-message.size[1])
+        image.block.paste(message.block,coords)
+      else:
+        image.join(message,"down")
     else:
-      self.size = size
       right  = self.__icon(weather.conditions('icon_url'))
       self.icoSize = right.size
       image = self.__time((size[0]/2,right.size[1]))
@@ -43,6 +45,7 @@ class Screen():
       image.join(right,"right")
       image.join(self.__conditions((size[0],size[1]/8)),"down")
       image.join(self.__forecast((size[0],size[1]/4)),"down")
+      image.expand(size)
     image.save(path)
     self.path = path
 

@@ -30,7 +30,7 @@ class Weather:
                                              + location
                                              + ".json").read()
       self.data = json.loads(wundergroundResponse)
-      if self.data["response"].has_key("error"):
+      if "error" in self.data["response"]:
         print ( "Weather server Message: " +\
                 str(self.data["response"]["error"]["description"]) )
 #        raise AttributeError

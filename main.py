@@ -21,9 +21,9 @@ if __name__ == '__main__':
     from interfaces.kindle.remote import RemoteDisplay
     from interfaces.kindle.screen import Screen
     dimensions = config.getDimensions()
-    font = config.getFont()
-    path = Screen(weather,dimensions,font=font)
-#    kindle = RemoteDisplay(path)
-#    kindle.auto()
+    font   = config.getFont()
+    screen = Screen(weather,dimensions,font=font)
+    kindle = RemoteDisplay(screen.path)
+    kindle.auto()
   if interfaces.find("web") != -1:
     pass

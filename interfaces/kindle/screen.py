@@ -83,7 +83,7 @@ class Screen():
     currentTemp = self.weather.conditions('temp_c')
     if feel:
       feelTemp = self.weather.conditions('feelslike_c')
-      if int(feelTemp) != int(currentTemp):
+      if int(float(feelTemp)) != int(float(currentTemp)):
         dimensions = (dimensions[0],dimensions[1]-self.iconSize[1])
 
         feels = Block((dimensions[0],self.iconSize[1]))

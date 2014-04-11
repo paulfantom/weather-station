@@ -41,7 +41,7 @@ class Screen():
       self.icoSize = right.size
       image = self.__time((size[0]/2,right.size[1]))
       image.join(self.__temperature((size[0]/2,size[1]/4)),"down")
-      right.join(self.__windAndPressure((size[0]/2,size[1]/4)),"down")
+      right.join(self.__windAndPressure((size[0]/2,size[1]/4),trend=False),"down")
       image.join(right,"right")
       image.join(self.__conditions((size[0],size[1]/8)),"down")
       image.join(self.__forecast((size[0],size[1]/4)),"down")
@@ -83,12 +83,13 @@ class Screen():
     currentTemp = self.weather.conditions('temp_c')
     if feel:
       feelTemp = self.weather.conditions('feelslike_c')
-      if int(feelTemp) != int(currentTemp):
+      if int(float(feelTemp)) != int(float(currentTemp)):
         dimensions = (dimensions[0],dimensions[1]-self.iconSize[1])
 
         feels = Block((dimensions[0],self.iconSize[1]))
         feels.text("It feels like " + feelTemp + unicode("°","utf-8"),\
-                   fontSize = 16,\
+                   vertical = "down",\
+                   fontSize = 20,\
                    fontPath = self.font)
 
     temperature = Block(dimensions).text(str(currentTemp) + unicode("°","utf-8"), \
@@ -112,27 +113,25 @@ class Screen():
     param[0] += " km/h"
     param[1] += " hpa"
 
-    if param[2]:
-      y = self.icoSize[1]/2
-    else:
-      y = 0
-    
-    dimensions = (dimensions[0],(dimensions[1]-y)/2)
-
     if trend:
+      y = self.icoSize[1]/2
       if param[2] != '+' or param[2] != '-':
         param[2] = "Pressure is stable"
       elif param[2] == '+':
         param[2] = "Pressure is rising"
       else:
         param[2] = "Pressure is falling"
+    else:
+      y = 0
+
+    dimensions = (dimensions[0],(dimensions[1]-y)/2)
 
     fontSize = 60
     justify  = "right"
     for idx,val in enumerate(param):
       if idx > 1:
         dimensions = (dimensions[0],y)
-        fontSize = 16
+        fontSize = 20
         justify  = "center"
       tmp = Block(dimensions).text(val,\
                                    horizontal = justify,\

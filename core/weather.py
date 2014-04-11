@@ -13,7 +13,10 @@ class Weather:
                apiKey=None,
                tmpFile=False):
 
-    options="conditions/forecast"
+    self.options  = "conditions/forecast"
+    self.location = location
+    self.api      = apiKey
+    self.data     = None
     if tmpFile:
       if type(tmpFile) != str:
         self.tmpFile = "/tmp/weatherStation.tmp"
@@ -21,24 +24,7 @@ class Weather:
         self.tmpFile = tmpFile
     else:
       self.tmpFile = False
-
-    try:
-      wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
-                                             + apiKey
-                                             + "/"
-                                             + options
-                                             + "/q/"
-                                             + location
-                                             + ".json").read()
-      self.data = json.loads(wundergroundResponse)
-      if "error" in self.data["response"]:
-        print ( "Weather server Message: " +\
-                str(self.data["response"]["error"]["description"]) )
-#        raise AttributeError
-        self.data = None
-    except Exception:
-      self.data = None
-      print "No weather data available"
+    self.update()
 
 # Private
 
@@ -64,6 +50,27 @@ class Weather:
       json.dump(data,fileContent,indent=2,sort_keys=True)
 
 # Public
+
+  def update():
+    try:
+      wundergroundResponse = urllib2.urlopen( "http://api.wunderground.com/api/"
+                                             + self.api
+                                             + "/"
+                                             + self.options
+                                             + "/q/"
+                                             + self.location
+                                             + ".json").read()
+      self.data = json.loads(wundergroundResponse)
+      if "error" in self.data["response"]:
+        print ( "Weather server Message: " +\
+                str(self.data["response"]["error"]["description"]) )
+        self.data = None
+      return True
+    except Exception:
+      self.data = None
+      print "No weather data available"
+      return False
+
 
   def conditions(self,parameter=None,save=False):
     if self.data == None:

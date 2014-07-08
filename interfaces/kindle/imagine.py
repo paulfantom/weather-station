@@ -69,6 +69,9 @@ class Block():
     else:
       colour = "white"
 
+    if value == '':
+      value = ' '
+
     value      = value.splitlines()
     linesCount = len(value)
 
@@ -181,3 +184,4 @@ if __name__ == '__main__':
   img.text("!!!!!!!!",fontSize=270)
   img2.text("Congratulations\nIt works!",horizontal="center")
   img.join(img2,"down")
+  img.show()

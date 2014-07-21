@@ -23,7 +23,7 @@ class RemoteDisplay:
       #                 port=self.port
       #                 timeout=4)
     except Exception:
-      print ( "Cannot connect do remote device" )
+      print ( "Cannot connect to remote device" )
 
   def send(self,where='/tmp/screen.png'):
     try:
